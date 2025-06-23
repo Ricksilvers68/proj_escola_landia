@@ -1,0 +1,25 @@
+node_modules/
+# Ignorar dependências
+node_modules/
+
+# Ignorar arquivos de log
+*.log
+logs
+npm-debug.log*
+
+# Ignorar arquivos de ambiente
+.env
+
+# Ignorar pastas de build/temp/cache (se usadas no futuro)
+dist/
+build/
+temp/
+tmp/
+.cache/
+
+# Configurações do VSCode
+.vscode/
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
