@@ -14,7 +14,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../views'));
 
 // Configurar a conexão com o MySQL
-const db = mysql.createConnection({
+const db = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: 'Landia2025@',
@@ -22,10 +22,10 @@ const db = mysql.createConnection({
 });
 
 // Conectar ao MySQL
-db.connect((err) => {
-    if (err) throw err;
-    console.log('Conectado ao MySQL Workbanch!');
-});
+//db.connect((err) => {
+   // if (err) throw err;
+    //console.log('Conectado ao MySQL Workbanch!');
+//});
 
 // Rota para exibir todos os alunos
 app.get('/', (req, res) => {
@@ -71,6 +71,57 @@ app.post('/delete/:id', (req, res) => {
         res.redirect('/');
     });
 });
+
+
+
+
+
+
+
+
+// Rota para exibir o formulário de busca
+app.get('/buscar', async (req, res) => {
+    res.render('buscar'); // Renderiza a view de busca
+});
+// Rota para buscar aluno
+
+app.post('/buscar', async (req, res) => {
+    const { nome, ra } = req.body;
+    console.log(`Buscando aluno: Nome = ${nome}, RA = ${ra}`);
+
+    // Validação do RA
+    const raRegex = /^\d+$/; // Regex para permitir apenas números
+    if (ra && !raRegex.test(ra)) {
+        return res.render('resultado', { aluno: null, horaAtual: null, erro: 'O RA deve conter apenas números.' });
+    }
+
+    const query = `SELECT * FROM alunos WHERE nome = ? && ra = ?`;
+
+    try {
+        const [results] = await db.promise().query(query, [nome, ra]);
+        console.log('Resultados encontrados:', results);
+
+        if (results.length > 0) {
+            const aluno = results[0];
+            const horaAtual = new Date().toLocaleTimeString();
+            res.render('resultado', { aluno, horaAtual, erro: null });
+        } else {
+            // Aqui, adicionamos uma mensagem de erro se nenhum aluno for encontrado
+            res.render('resultado', { aluno: null, horaAtual: null, erro: 'Nenhum aluno encontrado com esse nome ou RA.' });
+        }
+    } catch (error) {
+        console.error('Erro ao buscar aluno:', error);
+        res.status(500).send('Erro ao buscar aluno.');
+    }
+});
+
+
+
+
+
+
+
+
 
 // Iniciar o servidor
 app.listen(port, () => {
