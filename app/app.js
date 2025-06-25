@@ -87,33 +87,66 @@ app.get('/buscar', async (req, res) => {
 
 app.post('/buscar', async (req, res) => {
     const { nome, ra } = req.body;
-    console.log(`Buscando aluno: Nome = ${nome}, RA = ${ra}`);
 
-    // Validação do RA
-    const raRegex = /^\d+$/; // Regex para permitir apenas números
-    if (ra && !raRegex.test(ra)) {
-        return res.render('resultado', { aluno: null, horaAtual: null, erro: 'O RA deve conter apenas números.' });
-    }
+    const [results] = await db.promise().query(
+        'SELECT * FROM alunos WHERE nome = ? AND ra = ?', [nome, ra]
+    );
 
-    const query = `SELECT * FROM alunos WHERE nome = ? && ra = ?`;
+    if (results.length > 0) {
+        const aluno = results[0];
+        const horaAtual = new Date();
 
-    try {
-        const [results] = await db.promise().query(query, [nome, ra]);
-        console.log('Resultados encontrados:', results);
+        // 🔥 AQUI ENTRA O CÓDIGO PARA SALVAR NO BANCO:
+        await db.promise().query(
+            'INSERT INTO entradas (aluno_id, data_hora) VALUES (?, ?)',
+            [aluno.id, horaAtual]
+        );
 
-        if (results.length > 0) {
-            const aluno = results[0];
-            const horaAtual = new Date().toLocaleTimeString();
-            res.render('resultado', { aluno, horaAtual, erro: null });
-        } else {
-            // Aqui, adicionamos uma mensagem de erro se nenhum aluno for encontrado
-            res.render('resultado', { aluno: null, horaAtual: null, erro: 'Nenhum aluno encontrado com esse nome ou RA.' });
-        }
-    } catch (error) {
-        console.error('Erro ao buscar aluno:', error);
-        res.status(500).send('Erro ao buscar aluno.');
+        // Exibe Resultado para o aluno
+        res.render('resultado', {
+            aluno,
+            horaAtual: horaAtual.toLocaleTimeString(),
+            erro: null
+        });
+    } else {
+        res.render('resultado', {
+            aluno: null,
+            horaAtual: null,
+            erro: 'Nenhum aluno encontrado com esse nome ou RA.'
+        });
     }
 });
+
+
+
+
+
+
+app.get('/entradas', async (req, res) => {
+    const hoje = new Date();
+    const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 0, 0, 0);
+    const fim = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 23, 59, 59);
+
+    const query = `SELECT alunos.nome, alunos.ra, entradas.data_hora
+        FROM entradas
+        JOIN alunos ON entradas.aluno_id = alunos.id
+        WHERE entradas.data_hora BETWEEN ? AND ?
+        ORDER BY entradas.data_hora ASC`;
+    const [entradas] = await db.promise().query(query, [inicio, fim]);
+
+    res.render('entradas', { entradas }); // passa todas as entradas do dia para exibir
+});
+
+
+
+
+
+
+
+
+
+
+
 
 
 
