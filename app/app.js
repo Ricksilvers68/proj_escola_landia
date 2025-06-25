@@ -112,7 +112,7 @@ app.post('/buscar', async (req, res) => {
         res.render('resultado', {
             aluno: null,
             horaAtual: null,
-            erro: 'Nenhum aluno encontrado com esse nome ou RA.'
+            erro: 'Verifique se digitou corretamente seu Nome e RA.'
         });
     }
 });
