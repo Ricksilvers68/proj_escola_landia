@@ -1,15 +1,41 @@
 const express = require('express');
+const app = express();
 const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
 
-const app = express();
+app.use(session({
+  secret: 'segredo_supersecreto',
+  resave: false,
+  saveUninitialized: false,
+  cookie:{
+    maxAge: null
+  }
+}));
+
 const port = 3000;
 
 // Configurar middlewares
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Middleware de proteção
+function autenticar(req, res, next) {
+    // permite o acesso livre à página de busca e ao login
+    const rotasLivres = ['/buscar', '/login'];
+    if (rotasLivres.includes(req.path) || req.path.startsWith('/public')) {
+        return next();
+    }
+
+    if (req.session.usuarioLogado) {
+        return next();
+    }
+
+    return res.redirect('/login');
+}
+
+app.use(autenticar);
 
 // Configurar sessões
 app.use(session({
@@ -152,6 +178,33 @@ app.get('/entradas', async (req, res) => {
     const [entradas] = await db.promise().query(query, [inicio, fim]);
 
     res.render('entradas', { entradas });
+});
+
+// Rota GET login
+app.get('/login', (req, res) => {
+    res.render('login', { erro: null });
+});
+
+// Rota POST login
+app.post('/login', async (req, res) => {
+    const { usuario, senha } = req.body;
+    const [rows] = await db.promise().query(
+        'SELECT * FROM usuarios WHERE usuario = ? AND senha = ?', [usuario, senha]
+    );
+
+    if (rows.length > 0) {
+        req.session.usuarioLogado = rows[0].usuario;
+        return res.redirect('/');
+    } else {
+        return res.render('login', { erro: 'Usuário ou senha inválidos.' });
+    }
+});
+
+// Logout
+app.get('/logout', (req, res) => {
+    req.session.destroy(() => {
+        res.redirect('/login');
+    });
 });
 
 // Iniciar servidor
