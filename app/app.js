@@ -1,19 +1,28 @@
 const express = require('express');
 const mysql = require('mysql2');
 const bodyParser = require('body-parser');
-const app = express();
-const port = 3000;
+const session = require('express-session');
 const path = require('path');
 
-// Configurar o body-parser
+const app = express();
+const port = 3000;
+
+// Configurar middlewares
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configurar o EJS como motor de visualização
+// Configurar sessões
+app.use(session({
+    secret: 'segredo-supersecreto', // Pode trocar por algo mais forte
+    resave: false,
+    saveUninitialized: true
+}));
+
+// Configurar EJS como engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../views'));
 
-// Configurar a conexão com o MySQL
+// Conexão com banco MySQL
 const db = mysql.createPool({
     host: 'localhost',
     user: 'root',
@@ -21,13 +30,7 @@ const db = mysql.createPool({
     database: 'crud_db'
 });
 
-// Conectar ao MySQL
-//db.connect((err) => {
-   // if (err) throw err;
-    //console.log('Conectado ao MySQL Workbanch!');
-//});
-
-// Rota para exibir todos os alunos
+// Rota principal (listar alunos)
 app.get('/', (req, res) => {
     db.query('SELECT * FROM alunos', (err, results) => {
         if (err) throw err;
@@ -35,7 +38,7 @@ app.get('/', (req, res) => {
     });
 });
 
-// Rota para adicionar um novo aluno
+// Adicionar aluno
 app.post('/add', (req, res) => {
     const { nome, ra, data_nascimento } = req.body;
     db.query('INSERT INTO alunos (nome, ra, data_nascimento) VALUES (?, ?, ?)', [nome, ra, data_nascimento], (err) => {
@@ -44,7 +47,7 @@ app.post('/add', (req, res) => {
     });
 });
 
-// Rota para editar um aluno
+// Editar aluno
 app.get('/edit/:id', (req, res) => {
     const id = req.params.id;
     db.query('SELECT * FROM alunos WHERE id = ?', [id], (err, result) => {
@@ -53,7 +56,7 @@ app.get('/edit/:id', (req, res) => {
     });
 });
 
-// Rota para atualizar um aluno
+// Atualizar aluno
 app.post('/update/:id', (req, res) => {
     const id = req.params.id;
     const { nome, ra, data_nascimento } = req.body;
@@ -63,7 +66,7 @@ app.post('/update/:id', (req, res) => {
     });
 });
 
-// Rota para deletar um aluno
+// Deletar aluno
 app.post('/delete/:id', (req, res) => {
     const id = req.params.id;
     db.query('DELETE FROM alunos WHERE id = ?', [id], (err) => {
@@ -72,19 +75,12 @@ app.post('/delete/:id', (req, res) => {
     });
 });
 
-
-
-
-
-
-
-
-// Rota para exibir o formulário de busca
-app.get('/buscar', async (req, res) => {
-    res.render('buscar'); // Renderiza a view de busca
+// Formulário de busca
+app.get('/buscar', (req, res) => {
+    res.render('buscar');
 });
-// Rota para buscar aluno
 
+// Processar busca
 app.post('/buscar', async (req, res) => {
     const { nome, ra } = req.body;
 
@@ -96,67 +92,69 @@ app.post('/buscar', async (req, res) => {
         const aluno = results[0];
         const horaAtual = new Date();
 
-        // 🔥 AQUI ENTRA O CÓDIGO PARA SALVAR NO BANCO:
+        // Registra entrada
         await db.promise().query(
             'INSERT INTO entradas (aluno_id, data_hora) VALUES (?, ?)',
             [aluno.id, horaAtual]
         );
 
-        // Exibe Resultado para o aluno
-        res.render('resultado', {
+        // Armazena resultado da busca na sessão
+        req.session.resultadoBusca = {
             aluno,
             horaAtual: horaAtual.toLocaleTimeString(),
             erro: null
-        });
+        };
     } else {
-        res.render('resultado', {
+        // Caso não encontre o aluno
+        req.session.resultadoBusca = {
             aluno: null,
             horaAtual: null,
             erro: 'Verifique se digitou corretamente seu Nome e RA.'
-        });
+        };
     }
+
+    // Redireciona para página de resultado
+    res.redirect('/resultado');
 });
 
+// Página de resultado da busca
+app.get('/resultado', (req, res) => {
+    const resultado = req.session.resultadoBusca;
 
+    if (!resultado) {
+        return res.redirect('/buscar');
+    }
 
+    // Limpa a sessão após exibir
+    req.session.resultadoBusca = null;
 
+    res.render('resultado', {
+        aluno: resultado.aluno,
+        horaAtual: resultado.horaAtual,
+        erro: resultado.erro
+    });
+});
 
-
+// Entradas do dia
 app.get('/entradas', async (req, res) => {
     const hoje = new Date();
     const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 0, 0, 0);
     const fim = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 23, 59, 59);
 
-    const query = `SELECT alunos.nome, alunos.ra, entradas.data_hora
+    const query = `
+        SELECT alunos.nome, alunos.ra, entradas.data_hora
         FROM entradas
         JOIN alunos ON entradas.aluno_id = alunos.id
         WHERE entradas.data_hora BETWEEN ? AND ?
-        ORDER BY entradas.data_hora ASC`;
+        ORDER BY entradas.data_hora ASC
+    `;
+
     const [entradas] = await db.promise().query(query, [inicio, fim]);
 
-    res.render('entradas', { entradas }); // passa todas as entradas do dia para exibir
+    res.render('entradas', { entradas });
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Iniciar o servidor
+// Iniciar servidor
 app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
 });

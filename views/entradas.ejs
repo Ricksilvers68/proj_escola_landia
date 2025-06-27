@@ -8,13 +8,42 @@
     rel="stylesheet"
 />
 <style>
+/* Cabeçalho para exibição e impressão */
+.cabecalho {
+    text-align: center;
+    margin: 20px 0;
+}
+.cabecalho img {
+    max-width: 80px;
+}
+.cabecalho h1 {
+    font-size: 1.5rem;
+    margin: 5px 0;
+}
+.cabecalho h2 {
+    font-size: 1rem;
+    font-weight: normal;
+    color: #555;
+    margin: 0;
+}
+
+/* Ocultar botões e links ao imprimir */
 @media print {
-    .no-print { display: none; }
+    .no-print {
+        display: none;
+    }
 }
 </style>
 </head>
 <body class="bg-light">
-<div class="container mt-5">
+
+<!-- CABEÇALHO PARA IMPRESSÃO -->
+<div class="cabecalho">
+    <h1>EE Prof. Landia Santos Batista</h1>
+    <h2>CONTROLE DE PONTUALIDADE ESCOLAR</h2>
+</div>
+
+<div class="container mt-4">
     <div class="card shadow-sm">
         <div class="card-body">
             <h1 class="mb-4">Entradas do dia</h1>
@@ -36,12 +65,13 @@
                     <% }); %>
                 </tbody>
             </table>
-            <div class="no-print mt-3">
+            <div class="no-print mt-3 text-center">
                 <a href="/" class="btn btn-secondary">Voltar</a>
                 <button class="btn btn-success" onClick="window.print()">Imprimir Lista do Dia</button>
             </div>
         </div>
     </div>
 </div>
+
 </body>
 </html>
