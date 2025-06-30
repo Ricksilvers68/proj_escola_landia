@@ -1,72 +1,86 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Login - Controle de Pontualidade</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link 
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  >
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <style>
     body {
-      background: linear-gradient(#dee4ec, #177ce99a);
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background-color: #f8f9fa;
     }
-    .login-box {
+
+    .login-container {
       max-width: 400px;
-      background: #ffffffa6;
-      padding: 2.5rem;
-      border-radius: 12px;
-      box-shadow: 0 0 18px rgba(0,0,0,0.15);
+      margin: 60px auto;
+      padding: 30px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
     }
-    .login-title {
-      font-size: 1.5rem;
-      margin-bottom: 1.5rem;
-      color: #34495e;
-      font-weight: bold;
+
+    .school-header {
       text-align: center;
+      margin-top: 40px;
+      margin-bottom: -20px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #343a40;
     }
-    .btn-login {
-      width: 100%;
-    }
+
     .form-label {
-      color: #555;
+      font-weight: 500;
+    }
+
+    .alert {
+      margin-top: 10px;
     }
   </style>
 </head>
-<body>
-  <div class="login-box">
-    <div class="login-title">Controle de Pontualidade Escolar - CPE</div>
+<body style="background-color: blue;">
+  <div class="school-header">
+    <h1 style="color: white;">E E Professora Landia Santos Batista</h1>
+
+  <div class="login-container">
+    <h2 class="text-center mb-4"><span style="color: darkkhaki; font-size: 20px;">Olá!<br>Bem vindo ao</span><br>Controle de Pontualidade Escolar</h2>
+
     <% if (erro) { %>
-      <div class="alert alert-danger py-2"><%= erro %></div>
+      <div class="alert alert-danger" role="alert">
+        <%= erro %>
+      </div>
     <% } %>
-    <form method="POST" action="/login">
+
+    <form action="/login" method="POST" autocomplete="off">
       <div class="mb-3">
         <label for="usuario" class="form-label">Usuário</label>
-        <input type="text" class="form-control" id="usuario" name="usuario" required>
+        <input
+          type="text"
+          class="form-control"
+          id="usuario"
+          name="usuario"
+          autocomplete="off"
+          readonly
+          onfocus="this.removeAttribute('readonly')"
+          required
+        />
       </div>
       <div class="mb-3">
         <label for="senha" class="form-label">Senha</label>
-        <input type="password" class="form-control" id="senha" name="senha" required>
+        <input
+          type="password"
+          class="form-control"
+          id="senha"
+          name="senha"
+          autocomplete="new-password"
+          readonly
+          onfocus="this.removeAttribute('readonly')"
+          required
+        />
       </div>
-      <button type="submit" class="btn btn-primary btn-login mt-3">Entrar</button>
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary">Entrar</button>
+      </div>
     </form>
   </div>
-
-  <!-- FOOTER -->
-<footer class="bg-light text-muted py-3 fixed-bottom">
-  <div class="container d-flex justify-content-around align-items-center flex-wrap">
-    <small>&copy; 2025 EE PROFESSORA LANDIA SANTOS BATISTA</small>
-    <small>Endereço: Rua Professor Engenheiro Claudio Abraão, 210 - Ferraz de Vasconcelos/SP</small>
-    <small>Conheça a nossa <a href="#">Política de Privacidade</a></small>
-  </div>
-</footer>
-
-</body>
-</html>
 </body>
 </html>

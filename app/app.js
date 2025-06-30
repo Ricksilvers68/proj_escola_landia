@@ -58,7 +58,7 @@ const db = mysql.createPool({
 
 // Rota principal (listar alunos)
 app.get('/', (req, res) => {
-    db.query('SELECT * FROM alunos', (err, results) => {
+    db.query('SELECT * FROM alunos ORDER BY nome ASC', (err, results) => {
         if (err) throw err;
         res.render('index', { alunos: results });
     });
