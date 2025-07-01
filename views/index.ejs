@@ -44,15 +44,18 @@
       cursor: pointer;
     }
 
-    placeholder {
-
-    }
+    .logoff-fixed {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+}
   </style>
 </head>
 
 <body>
-<!--para deslogar-->
-    <div class="d-flex justify-content-end p-3">
+<!-- Botão fixo de logout no canto superior direito -->
+<div class="logoff-fixed">
   <a href="/logout" class="btn btn-outline-danger btn-sm">
     <i class="bi bi-box-arrow-right"></i> Sair
   </a>

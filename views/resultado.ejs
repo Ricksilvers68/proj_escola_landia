@@ -2,76 +2,60 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Resultado da Busca</title>
+  <title>Confirmação de Entrada</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    @media print {
-      .no-print {
-        display: none;
-      }
+    body {
+      background-color: #f8f9fa;
     }
-/* Cabeçalho para exibição e impressão */
-.cabecalho {
-    text-align: center;
-    margin: 20px 0;
-}
-.cabecalho img {
-    max-width: 80px;
-}
-.cabecalho h1 {
-    font-size: 1.5rem;
-    margin: 5px 0;
-}
-.cabecalho h2 {
-    font-size: 1rem;
-    font-weight: normal;
-    color: #555;
-    margin: 0;
-}
 
-/* Ocultar botões e links ao imprimir */
-@media print {
-    .no-print {
-        display: none;
+    .container {
+      margin-top: 60px;
     }
-}
-</style>
-</head>
-<body class="bg-light">
 
-<!-- CABEÇALHO PARA IMPRESSÃO -->
-<div class="cabecalho">
-    <h1>EE Prof. Landia Santos Batista</h1>
-    <h2>CONTROLE DE PONTUALIDADE ESCOLAR</h2>
-</div>
-  
+    .cabecalho {
+      text-align: center;
+      margin-bottom: 30px;
+    }
 
+    .cabecalho h1 {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+
+    .cabecalho h2 {
+      font-size: 1rem;
+      color: #555;
+    }
+
+    .card {
+      border: none;
+    }
+  </style>
 </head>
-<body class="bg-light">
-  <div class="container mt-5">
-    <div class="card shadow-sm">
+<body>
+  <div class="container text-center">
+    <div class="cabecalho">
+      <h1>EE Prof. Landia Santos Batista</h1>
+      <h2>Controle de Pontualidade Escolar</h2>
+    </div>
+
+    <div class="card shadow-sm mx-auto" style="max-width: 500px;">
       <div class="card-body">
-        <h1 class="mb-4">Resultado da Busca</h1>
-
-        <% if (typeof erro !== 'undefined' && erro) { %>
+        <% if (erro) { %>
           <div class="alert alert-danger"><%= erro %></div>
-        <% } %>
-
-        <% if (typeof aluno !== 'undefined' && aluno) { %>
+          <a href="/buscar" class="btn btn-secondary mt-3">Tentar Novamente</a>
+        <% } else if (aluno) { %>
+          <h4 class="mb-3 text-success">Registro efetuado com sucesso!</h4>
           <p><strong>Nome:</strong> <%= aluno.nome %></p>
           <p><strong>RA:</strong> <%= aluno.ra %></p>
-          <p><strong>Horário de Entrada:</strong> <%= horaAtual %></p>
-        <% } else if (!erro) { %>
-          <p class="text-muted">Nenhuma informação para exibir.</p>
-        <% } %>
+          <p><strong>Horário:</strong> <%= horaAtual %></p>
 
-        <div class="mt-4 no-print">
-          <a href="/buscar" class="btn btn-secondary">Nova Busca</a>
-          <% if (aluno) { %>
-            
-            <button onclick="window.print()" class="btn btn-success">Imprimir</button>
-          <% } %>
-        </div>
+          <a href="/buscar" class="btn btn-primary mt-4">Voltar</a>
+        <% } else { %>
+          <div class="alert alert-warning">Nenhuma informação para exibir.</div>
+          <a href="/buscar" class="btn btn-secondary mt-3">Voltar</a>
+        <% } %>
       </div>
     </div>
   </div>

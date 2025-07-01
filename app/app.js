@@ -5,14 +5,13 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
 
+// Configurar sessões
 app.use(session({
-  secret: 'segredo_supersecreto',
-  resave: false,
-  saveUninitialized: false,
-  cookie:{
-    maxAge: null
-  }
+    secret: 'segredo-supersecreto', // Pode trocar por algo mais forte
+    resave: false,
+    saveUninitialized: true
 }));
+app.use(autenticar);
 
 const port = 3000;
 
@@ -23,7 +22,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Middleware de proteção
 function autenticar(req, res, next) {
     // permite o acesso livre à página de busca e ao login
-    const rotasLivres = ['/buscar', '/login'];
+    const rotasLivres = ['/buscar', '/login', '/resultado'];
     if (rotasLivres.includes(req.path) || req.path.startsWith('/public')) {
         return next();
     }
@@ -36,13 +35,6 @@ function autenticar(req, res, next) {
 }
 
 app.use(autenticar);
-
-// Configurar sessões
-app.use(session({
-    secret: 'segredo-supersecreto', // Pode trocar por algo mais forte
-    resave: false,
-    saveUninitialized: true
-}));
 
 // Configurar EJS como engine
 app.set('view engine', 'ejs');
@@ -167,18 +159,48 @@ app.get('/entradas', async (req, res) => {
     const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 0, 0, 0);
     const fim = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 23, 59, 59);
 
-    const query = `
-        SELECT alunos.nome, alunos.ra, entradas.data_hora
+    const query = `SELECT alunos.nome, alunos.ra, entradas.data_hora
         FROM entradas
         JOIN alunos ON entradas.aluno_id = alunos.id
         WHERE entradas.data_hora BETWEEN ? AND ?
-        ORDER BY entradas.data_hora ASC
-    `;
+        ORDER BY entradas.data_hora ASC`;
 
+    
     const [entradas] = await db.promise().query(query, [inicio, fim]);
 
     res.render('entradas', { entradas });
 });
+
+//entradas mês
+app.get('/entradas-mes', (req, res) => {
+  const agora = new Date();
+  const ano = agora.getFullYear();
+  const mes = agora.getMonth() + 1;
+
+  const mesFormatado = mes < 10 ? `0${mes}`: `${mes}`;
+  const inicioDoMes = `${ano}-${mesFormatado}-01 00:00:00`;
+
+  const proximoMes = mes + 1;
+  const proximoAno = proximoMes > 12 ? ano + 1 : ano;
+  const proximoMesFormatado = proximoMes > 12 ? '01' : (proximoMes < 10 ? `0${proximoMes}` : `${proximoMes}`);
+  const inicioDoProximoMes = `${proximoAno}-${proximoMesFormatado}-01 00:00:00`;
+
+  const sql = `SELECT entradas.*, alunos.nome, alunos.ra
+    FROM entradas
+    INNER JOIN alunos ON entradas.aluno_id = alunos.id
+    WHERE entradas.data_hora >= ? AND entradas.data_hora < ?
+    ORDER BY entradas.data_hora DESC`;
+
+  db.query(sql, [inicioDoMes, inicioDoProximoMes], (err, resultados) => {
+    if (err) {
+      console.error('Erro ao buscar entradas do mês:', err);
+      return res.status(500).send('Erro no servidor');
+    }
+    res.render('entradas_mes', { entradas: resultados });
+  });
+});
+
+
 
 // Rota GET login
 app.get('/login', (req, res) => {
@@ -209,5 +231,5 @@ app.get('/logout', (req, res) => {
 
 // Iniciar servidor
 app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
+    console.log(`Tudo ok! Servidor rodando em http://localhost:${port}`);
 });
