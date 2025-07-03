@@ -118,11 +118,14 @@ app.post('/buscar', async (req, res) => {
         );
 
         // Armazena resultado da busca na sessão
-        req.session.resultadoBusca = {
-            aluno,
-            horaAtual: horaAtual.toLocaleTimeString(),
-            erro: null
-        };
+       const justificativaInformada = justificativa?.trim() ? 'Sim' : 'Não';
+
+req.session.resultadoBusca = {
+    aluno,
+    horaAtual: horaAtual.toLocaleTimeString(),
+    justificativa: justificativaInformada,
+    erro: null
+};
     } else {
         // Caso não encontre o aluno
         req.session.resultadoBusca = {
