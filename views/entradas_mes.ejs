@@ -29,6 +29,8 @@
           <th>RA</th>
           <th>Data</th>
           <th>Hora</th>
+          <th>Justificativa</th>
+        
         </tr>
       </thead>
       <tbody>
@@ -38,6 +40,7 @@
             <td><%= entrada.ra %></td>
             <td><%= new Date(entrada.data_hora).toISOString().split('T')[0] %></td>
             <td><%= new Date(entrada.data_hora).toTimeString().split(' ')[0] %></td>
+            <td><%= entrada.justificativa || '-' %></td>
           </tr>
         <% }) %>
       </tbody>

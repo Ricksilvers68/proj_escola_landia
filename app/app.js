@@ -100,7 +100,8 @@ app.get('/buscar', (req, res) => {
 
 // Processar busca
 app.post('/buscar', async (req, res) => {
-    const { nome, ra } = req.body;
+    console.log(req.body)
+    const { nome, ra, justificativa } = req.body;
 
     const [results] = await db.promise().query(
         'SELECT * FROM alunos WHERE nome = ? AND ra = ?', [nome, ra]
@@ -112,8 +113,8 @@ app.post('/buscar', async (req, res) => {
 
         // Registra entrada
         await db.promise().query(
-            'INSERT INTO entradas (aluno_id, data_hora) VALUES (?, ?)',
-            [aluno.id, horaAtual]
+            'INSERT INTO entradas (aluno_id, data_hora, justificativa) VALUES (?, ?, ?)',
+            [aluno.id, horaAtual, justificativa]
         );
 
         // Armazena resultado da busca na sessão
@@ -149,7 +150,8 @@ app.get('/resultado', (req, res) => {
     res.render('resultado', {
         aluno: resultado.aluno,
         horaAtual: resultado.horaAtual,
-        erro: resultado.erro
+        erro: resultado.erro,
+        justificativa: resultado.justificativa
     });
 });
 
@@ -159,7 +161,7 @@ app.get('/entradas', async (req, res) => {
     const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 0, 0, 0);
     const fim = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 23, 59, 59);
 
-    const query = `SELECT alunos.nome, alunos.ra, entradas.data_hora
+    const query = `SELECT alunos.nome, alunos.ra, entradas.data_hora, entradas.justificativa
         FROM entradas
         JOIN alunos ON entradas.aluno_id = alunos.id
         WHERE entradas.data_hora BETWEEN ? AND ?

@@ -53,6 +53,7 @@
                         <th>Nome</th>
                         <th>RA</th>
                         <th>Hora de Entrada</th>
+                        <th>Justificativa</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -61,6 +62,7 @@
                             <td><%= entrada.nome %></td>
                             <td><%= entrada.ra %></td>
                             <td><%= new Date(entrada.data_hora).toLocaleTimeString() %></td>
+                             <td><%= entrada.justificativa || 'sem justificativa' %></td>
                         </tr>
                     <% }); %>
                 </tbody>
