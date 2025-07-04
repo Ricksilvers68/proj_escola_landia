@@ -44,7 +44,7 @@ app.set('views', path.join(__dirname, '../views'));
 const db = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: 'Landia2025@',
+    password: 'Ss376Ss376',
     database: 'crud_db'
 });
 
@@ -114,7 +114,7 @@ app.post('/buscar', async (req, res) => {
         // Registra entrada
         await db.promise().query(
             'INSERT INTO entradas (aluno_id, data_hora, justificativa) VALUES (?, ?, ?)',
-            [aluno.id, horaAtual, justificativa]
+            [aluno.id, horaAtual, justificativa || null]
         );
 
         // Armazena resultado da busca na sessão
@@ -165,10 +165,10 @@ app.get('/entradas', async (req, res) => {
     const fim = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 23, 59, 59);
 
     const query = `SELECT alunos.nome, alunos.ra, entradas.data_hora, entradas.justificativa
-        FROM entradas
-        JOIN alunos ON entradas.aluno_id = alunos.id
-        WHERE entradas.data_hora BETWEEN ? AND ?
-        ORDER BY entradas.data_hora ASC`;
+    FROM entradas
+    JOIN alunos ON entradas.aluno_id = alunos.id
+    WHERE entradas.data_hora BETWEEN ? AND ?
+    ORDER BY alunos.nome ASC, entradas.data_hora ASC`;
 
     
     const [entradas] = await db.promise().query(query, [inicio, fim]);
@@ -194,7 +194,7 @@ app.get('/entradas-mes', (req, res) => {
     FROM entradas
     INNER JOIN alunos ON entradas.aluno_id = alunos.id
     WHERE entradas.data_hora >= ? AND entradas.data_hora < ?
-    ORDER BY entradas.data_hora DESC`;
+    ORDER BY alunos.nome ASC, entradas.data_hora ASC`;
 
   db.query(sql, [inicioDoMes, inicioDoProximoMes], (err, resultados) => {
     if (err) {
