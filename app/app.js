@@ -168,7 +168,7 @@ app.get('/entradas', async (req, res) => {
         FROM entradas
         JOIN alunos ON entradas.aluno_id = alunos.id
         WHERE entradas.data_hora BETWEEN ? AND ?
-        ORDER BY entradas.data_hora ASC`;
+        ORDER BY alunos.nome ASC, entradas.data_hora ASC`;
 
     
     const [entradas] = await db.promise().query(query, [inicio, fim]);
@@ -194,7 +194,7 @@ app.get('/entradas-mes', (req, res) => {
     FROM entradas
     INNER JOIN alunos ON entradas.aluno_id = alunos.id
     WHERE entradas.data_hora >= ? AND entradas.data_hora < ?
-    ORDER BY entradas.data_hora DESC`;
+    ORDER BY alunos.nome ASC, entradas.data_hora ASC`;
 
   db.query(sql, [inicioDoMes, inicioDoProximoMes], (err, resultados) => {
     if (err) {
