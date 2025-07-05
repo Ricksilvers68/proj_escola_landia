@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
 
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Configurar sessões
 app.use(session({
     secret: 'segredo-supersecreto', // Pode trocar por algo mais forte
@@ -12,12 +14,11 @@ app.use(session({
     saveUninitialized: true
 }));
 app.use(autenticar);
-
-const port = 3000;
-
 // Configurar middlewares
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+
+
+const port = 3000;
 
 // Middleware de proteção
 function autenticar(req, res, next) {
