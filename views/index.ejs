@@ -56,7 +56,7 @@
 <body>
 <!-- Botão fixo de logout no canto superior direito -->
 <div class="logoff-fixed">
-  <a href="/logout" class="btn btn-outline-danger btn-sm">
+  <a href="/logout" class="btn btn-outline-dark btn-sm">
     <i class="bi bi-box-arrow-right"></i> Sair
   </a>
 </div>
@@ -65,7 +65,6 @@
   <div class="container mt-3">
     <div class="fixed-header">
         <header class="text-dark text-center py-3">
-  <h1 class="h6">E E Professora Landia Santos Batista</h1>
   <h2 class="h6">CONTROLE DE PONTUALIDADE ESCOLAR - CPE</h1>
 </header>
       <h2 class="mb-3 center text-center">Lista de Alunos</h2>
@@ -73,35 +72,47 @@
       <div class="mb-3">
         <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Buscar por Nome ou RA...">
       </div>
+<!--mensagem de erro para o usario, caso já exist o nome no banco-->
+      <% if (typeof erro !== 'undefined' && erro) { %>
+  <div class="alert alert-danger"><%= erro %></div>
+<% } %>
 
       <form action="/add" method="POST" class="row g-2 align-items-end mb-3">
-        <div class="col-md-3">
-          <label for="nome" class="form-label">Nome</label>
-          <input type="text" id="nome" name="nome" class="form-control" placeholder="Digite o nome" autocomplete="off" required>
-        </div>
-        <div class="col-md-2">
-          <label for="ra" class="form-label">RA</label>
-          <input type="number" id="ra" name="ra" class="form-control" placeholder="RA" autocomplete="off" required>
-        </div>
-        <div class="col-md-3">
-          <label for="data_nascimento" class="form-label">Data de Nascimento</label>
-          <input type="date" id="data_nascimento" name="data_nascimento" class="form-control" required>
-        </div>
-        <div class="col-auto d-flex align-items-end">
-          <button type="submit" class="btn btn-success me-2">
-            <i class="bi bi-person-plus"></i> Adicionar Aluno
-          </button>
-          <a href="/buscar" class="btn btn-secondary me-2">
+  <div class="col-md-3">
+    <label for="nome" class="form-label">Nome</label>
+    <input type="text" id="nome" name="nome" class="form-control" placeholder="Digite o nome" autocomplete="off" required>
+  </div>
+
+  <div class="col-md-2">
+    <label for="ra" class="form-label">RA</label>
+    <input type="number" id="ra" name="ra" class="form-control" placeholder="RA" autocomplete="off" required>
+  </div>
+
+  <div class="col-md-3">
+    <label for="data_nascimento" class="form-label">Data de Nascimento</label>
+    <input type="date" id="data_nascimento" name="data_nascimento" class="form-control" required>
+  </div>
+
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-success w-100">
+      <i class="bi bi-person-plus"></i> Adicionar Aluno
+    </button>
+  </div>
+</form>
+           <a href="/buscar" class="btn btn-info btn-sm me-2">
             <i class="bi bi-search"></i> Registrar Entrada
           </a>
-          <a href="/entradas" class="btn btn-info me-2">
+           <a href="/entradas" class="btn btn-primary btn-sm me-2">
             <i class="bi bi-list-ul"></i> Entradas do Dia
           </a>
-          <a href="/entradas-mes" class="btn btn-outline-info me-2">
+          <a href="/entradas-mes" class="btn btn-outline-info btn-sm me-2">
             <i class="bi bi-calendar-month"></i> Entradas do Mês
           </a>
+          <a href="/relatorio_data" class="btn btn-outline-warning btn-sm me-2">
+            <i class="bi bi-calendar-month"></i> Relatório por data
+          </a>
           <button class="btn btn-outline-success" onclick="imprimirTabela()">
-            <i class="bi bi-printer"></i> Imprimir
+            <i class="bi bi-printer"></i>
           </button>
         </div>
       </form>

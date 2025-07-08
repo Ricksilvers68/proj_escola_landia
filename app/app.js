@@ -57,12 +57,29 @@ app.get('/', (req, res) => {
     });
 });
 
-// Adicionar aluno
+// Adicionar aluno (com verificação de duplicados)
 app.post('/add', (req, res) => {
     const { nome, ra, data_nascimento } = req.body;
-    db.query('INSERT INTO alunos (nome, ra, data_nascimento) VALUES (?, ?, ?)', [nome, ra, data_nascimento], (err) => {
+
+    // Verifica se já existe aluno com o mesmo nome e RA
+    const queryVerifica = 'SELECT * FROM alunos WHERE nome = ? AND ra = ?';
+    db.query(queryVerifica, [nome, ra], (err, resultados) => {
         if (err) throw err;
-        res.redirect('/');
+
+        if (resultados.length > 0) {
+            // Já existe aluno com esse nome e RA — renderiza erro
+            return res.render('index', {
+                alunos: resultados, // ou envie a lista completa se quiser
+                erro: 'Aluno com este nome e RA já está cadastrado!'
+            });
+        }
+
+        // Se não existe, insere normalmente
+        const queryInsere = 'INSERT INTO alunos (nome, ra, data_nascimento) VALUES (?, ?, ?)';
+        db.query(queryInsere, [nome, ra, data_nascimento], (err) => {
+            if (err) throw err;
+            res.redirect('/');
+        });
     });
 });
 
@@ -92,6 +109,39 @@ app.post('/delete/:id', (req, res) => {
         if (err) throw err;
         res.redirect('/');
     });
+});
+
+//Rota get para formulario de busca por data
+app.get('/relatorio_data', (req, res) => {
+  res.render('relatorio_data', {entradas: []});
+});
+
+//Para processar a busca por data
+app.post('/relatorio_data', async (req, res) => {
+  const { inicio, fim } = req.body;
+
+  if (!inicio || !fim) {
+    return res.render('relatorio_data', { entradas: [] });
+  }
+
+  const data_inicio_completa = `${inicio} 00:00:00`;
+  const data_fim_completa = `${fim} 23:59:59`;
+
+  const sql = `
+    SELECT entradas.*, alunos.nome, alunos.ra
+    FROM entradas
+    JOIN alunos ON entradas.aluno_id = alunos.id
+    WHERE entradas.data_hora BETWEEN ? AND ?
+    ORDER BY entradas.data_hora ASC
+  `;
+
+  try {
+    const [entradas] = await db.promise().query(sql, [data_inicio_completa, data_fim_completa]);
+    res.render('relatorio_data', { entradas });
+  } catch (error) {
+    console.error('Erro ao buscar entradas por período:', error);
+    res.render('relatorio_data', { entradas: [] });
+  }
 });
 
 // Formulário de busca

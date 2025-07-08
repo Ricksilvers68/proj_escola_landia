@@ -6,63 +6,102 @@
   <title>Login</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <style>
-    body {
-      position: relative;
-      min-height: 100vh;
-      margin: 0;
-      background-image: url('/images/img3.jpeg');
-      background-size: 80%; /* Reduz visualmente a imagem */
-      background-repeat: no-repeat;
-      background-position: center;
-      background-attachment: fixed;
+    * {
+      box-sizing: border-box;
     }
 
-    /* ✅ Camada translúcida por cima da imagem de fundo */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: #0d1b2a;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-image: url('/images/img5.jpeg');
+      background-repeat: no-repeat;
+      background-position: center top;
+      background-size: 75%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
     .background-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.3); /* branco com 40% de opacidade */
+      background-color: rgba(0, 0, 0, 0.4);
       z-index: 0;
     }
 
     .login-container {
-      max-width: 500px;
-      margin: 60px auto;
-      padding: 30px;
-      background-color: rgba(255, 255, 255, 0.85);
-      border-radius: 10px;
-      box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
-      position: relative;
-      z-index: 1;
-    }
-
-    .form-label {
-      font-weight: 500;
-    }
-
-    .alert {
-      margin-top: 10px;
-    }
+  width: 100%;
+  max-width: 400px;
+  padding: 30px;
+  margin: 20px auto;
+  background-color: rgba(255, 255, 255, 0.65);
+  border-radius: 20px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  z-index: 1;
+  position: relative;
+}
 
     footer {
-      position: relative;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+      color: white;
+      padding: 8px;
+      font-size: 14px;
+      background-color: transparent;
       z-index: 1;
     }
+
+    /* ✅ Ajustes MOBILE */
+    @media (max-width: 768px) {
+  body {
+    background-image: url('/images/img5.jpeg'); /* ou 'landia_mobile.jpeg' */
+    background-size: cover;
+    background-position: top center;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+  }
+
+  .login-container {
+    width: 60%;       /* 🔽 ocupa quase toda a largura do celular */
+    padding: 16px;     /* 🔽 reduz o padding */
+    margin-top: 40px;  /* 🔽 sobe o formulário */
+    font-size: 0.95rem;
+    
+  }
+
+  .login-container input,
+  .login-container textarea,
+  .login-container button {
+    font-size: 1rem;
+  }
+
+  h2 {
+    font-size: 1rem;
+    text-align: center;
+  }
+}
   </style>
 </head>
 <body>
-  <!-- ✅ Camada de transparência sobre a imagem -->
   <div class="background-overlay"></div>
 
   <div class="login-container">
     <h2 class="text-center mb-4">
-      <span style="color: darkkhaki; font-size: 20px;">Olá!<br>Bem vindo ao</span><br>Controle de Pontualidade Escolar
+      <span style="color: rgb(92, 86, 1); font-size: 20px;">Olá!<br>Bem-vindo ao</span><br>Controle de Pontualidade Escolar
     </h2>
 
-    <!-- Formulário -->
     <form action="/login" method="POST" autocomplete="off">
       <div class="mb-3">
         <label for="usuario" class="form-label">Usuário</label>
@@ -80,8 +119,7 @@
 
   <footer class="sm-light text-muted py-3 fixed-bottom">
     <div class="container d-flex justify-content-around align-items-center flex-wrap">
-      <small>&copy; 2025 EE PROFESSORA LANDIA SANTOS BATISTA</small>
-      <small>Endereço: Rua Professor Engenheiro Claudio Abraão, 210 - Ferraz de Vasconcelos/SP</small>
+      <small style="color: white; font-size:medium;">&copy; 2025 E.E. Professora Landia Santos Batista</small>
     </div>
   </footer>
 </body>
