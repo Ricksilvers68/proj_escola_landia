@@ -11,18 +11,9 @@
 
   <style>
     body, html {
-      height: 100%;
       margin: 0;
       padding: 0;
-    }
-
-    .fixed-header {
-      position: sticky;
-      top: 0;
-      z-index: 999;
-      background: #f8f9fa;
-      padding: 20px 10px;
-      border-bottom: 1px solid #ccc;
+      height: 100%;
     }
 
     .scrollable-table {
@@ -35,73 +26,90 @@
       line-height: 1.2;
     }
 
-    table.table tbody tr {
-      transition: background-color 0.3s ease;
-    }
-
     table.table tbody tr:hover {
       background-color: #deeff5;
       cursor: pointer;
     }
 
-    .logoff-fixed {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 1000;
-    }
+    @media (max-width: 576px) {
+      .menu-content {
+        flex-direction: column;
+      }
 
-    @media (max-width: 768px) {
-      .logoff-fixed {
-        display: none;
+      .menu-content .form-control,
+      .menu-content button,
+      .menu-content a {
+        margin-bottom: 10px;
+        width: 100%;
       }
     }
   </style>
 </head>
 
 <body>
+  <!-- Navbar com formulário e botões dentro do menu -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#"></a>
 
-<!-- ✅ Navbar responsiva para mobile -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm d-lg-none">
-  <div class="container-fluid">
-    <a class="navbar-brand fw-bold" href="#">CPE</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal" aria-controls="menuPrincipal" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal" aria-controls="menuPrincipal" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-    <div class="collapse navbar-collapse" id="menuPrincipal">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a href="/buscar" class="nav-link"><i class="bi bi-search"></i> Registrar Entrada</a></li>
-        <li class="nav-item"><a href="/entradas" class="nav-link"><i class="bi bi-list-ul"></i> Entradas do Dia</a></li>
-        <li class="nav-item"><a href="/entradas-mes" class="nav-link"><i class="bi bi-calendar-month"></i> Entradas do Mês</a></li>
-        <li class="nav-item"><a href="/relatorio_data" class="nav-link"><i class="bi bi-calendar-month"></i> Relatório por data</a></li>
-        <li class="nav-item">
-          <button class="btn btn-outline-success btn-sm" onclick="imprimirTabela()">
-            <i class="bi bi-printer"></i> Imprimir
-          </button>
-        </li>
-        <li class="nav-item mt-2">
-          <a href="/logout" class="btn btn-outline-dark btn-sm w-100"><i class="bi bi-box-arrow-right"></i> Sair</a>
-        </li>
-      </ul>
+      <div class="collapse navbar-collapse" id="menuPrincipal">
+        <div class="menu-content d-flex flex-wrap align-items-center gap-2">
+
+          <!-- Formulário de adicionar aluno -->
+          <form action="/add" method="POST" class="row g-2 align-items-end w-100">
+            <div class="col-md-3">
+              <label for="nome" class="form-label"></label>
+              <input type="text" id="nome" name="nome" class="form-control" placeholder="Digite o nome" required>
+            </div>
+            <div class="col-md-2">
+              <label for="ra" class="form-label"></label>
+              <input type="number" id="ra" name="ra" class="form-control" placeholder="RA" required>
+            </div>
+            <div class="col-md-3">
+              <label for="data_nascimento" class="form-label"></label>
+              <input type="date" id="data_nascimento" name="data_nascimento" class="form-control" required>
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-success w-30">
+                <i class="bi bi-person-plus"></i> Adicionar
+              </button>
+            </div>
+          </form>
+
+          <!-- Botões de navegação -->
+          <div class="d-flex flex-wrap gap-2 mt-2">
+            <a href="/buscar" class="btn btn-info btn-sm">
+              <i class="bi bi-search"></i> Registrar Entrada
+            </a>
+            <a href="/entradas" class="btn btn-primary btn-sm">
+              <i class="bi bi-list-ul"></i> Entradas do Dia
+            </a>
+            <a href="/entradas-mes" class="btn btn-outline-info btn-sm">
+              <i class="bi bi-calendar-month"></i> Entradas do Mês
+            </a>
+            <a href="/relatorio_data" class="btn btn-outline-warning btn-sm">
+              <i class="bi bi-calendar-month"></i> Relatório por Data
+            </a>
+            <button class="btn btn-outline-success btn-sm" onclick="imprimirTabela()">
+              <i class="bi bi-printer"></i>
+            </button>
+            <a href="/logout" class="btn btn-outline-dark btn-sm">
+              <i class="bi bi-box-arrow-right"></i> Sair
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
-<!-- Botão fixo para desktop -->
-<div class="logoff-fixed d-none d-lg-block">
-  <a href="/logout" class="btn btn-outline-dark btn-sm">
-    <i class="bi bi-box-arrow-right"></i> Sair
-  </a>
-</div>
+  <div class="container mt-3">
+    <h2 class="h6 text-center">CONTROLE DE PONTUALIDADE ESCOLAR - CPE</h2>
 
-<div class="container mt-3">
-  <div class="fixed-header">
-    <header class="text-dark text-center py-3">
-      <h2 class="h6">CONTROLE DE PONTUALIDADE ESCOLAR - CPE</h2>
-    </header>
-
-    <h2 class="mb-3 center text-center">Lista de Alunos</h2>
+    <h2 class="mb-3 text-center">Lista de Alunos</h2>
 
     <div class="mb-3">
       <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Buscar por Nome ou RA...">
@@ -111,98 +119,57 @@
       <div class="alert alert-danger"><%= erro %></div>
     <% } %>
 
-    <form action="/add" method="POST" class="row g-2 align-items-end mb-3">
-      <div class="col-md-3">
-        <label for="nome" class="form-label">Nome</label>
-        <input type="text" id="nome" name="nome" class="form-control" placeholder="Digite o nome" autocomplete="off" required>
-      </div>
-      <div class="col-md-2">
-        <label for="ra" class="form-label">RA</label>
-        <input type="number" id="ra" name="ra" class="form-control" placeholder="RA" autocomplete="off" required>
-      </div>
-      <div class="col-md-3">
-        <label for="data_nascimento" class="form-label">Data de Nascimento</label>
-        <input type="date" id="data_nascimento" name="data_nascimento" class="form-control" required>
-      </div>
-      <div class="col-md-2">
-        <button type="submit" class="btn btn-success w-100">
-          <i class="bi bi-person-plus"></i> Adicionar Aluno
-        </button>
-      </div>
-    </form>
-
-    <!-- Botões principais (visíveis em desktop e tablet) -->
-    <div class="d-none d-lg-block mb-3">
-      <a href="/buscar" class="btn btn-info btn-sm me-2">
-        <i class="bi bi-search"></i> Registrar Entrada
-      </a>
-      <a href="/entradas" class="btn btn-primary btn-sm me-2">
-        <i class="bi bi-list-ul"></i> Entradas do Dia
-      </a>
-      <a href="/entradas-mes" class="btn btn-outline-info btn-sm me-2">
-        <i class="bi bi-calendar-month"></i> Entradas do Mês
-      </a>
-      <a href="/relatorio_data" class="btn btn-outline-warning btn-sm me-2">
-        <i class="bi bi-calendar-month"></i> Relatório por data
-      </a>
-      <button class="btn btn-outline-success" onclick="imprimirTabela()">
-        <i class="bi bi-printer"></i>
-      </button>
+    <div class="scrollable-table mt-2">
+      <table class="table table-striped table-bordered">
+        <thead class="table-light">
+          <tr>
+            <th>Nome</th>
+            <th>RA</th>
+            <th>Data de Nascimento</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% alunos.forEach(aluno => { %>
+            <tr>
+              <td><%= aluno.nome.toUpperCase() %></td>
+              <td><%= aluno.ra %></td>
+              <td><%= aluno.data_nascimento.toISOString().split('T')[0] %></td>
+              <td>
+                <a href="/edit/<%= aluno.id %>" class="btn btn-sm btn-info">Editar</a>
+                <form action="/delete/<%= aluno.id %>" method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir este aluno?');">
+                  <button type="submit" class="btn btn-sm btn-light">Excluir</button>
+                </form>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
     </div>
   </div>
 
-  <div class="scrollable-table mt-2">
-    <table class="table table-striped table-bordered">
-      <thead class="table-light">
-        <tr>
-          <th>Nome</th>
-          <th>RA</th>
-          <th>Data de Nascimento</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% alunos.forEach(aluno => { %>
-          <tr>
-            <td><%= aluno.nome.toUpperCase() %></td>
-            <td><%= aluno.ra %></td>
-            <td><%= aluno.data_nascimento.toISOString().split('T')[0] %></td>
-            <td>
-              <a href="/edit/<%= aluno.id %>" class="btn btn-sm btn-info">Editar</a>
-              <form action="/delete/<%= aluno.id %>" method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir este aluno?');">
-                <button type="submit" class="btn btn-sm btn-light">Excluir</button>
-              </form>
-            </td>
-          </tr>
-        <% }); %>
-      </tbody>
-    </table>
-  </div>
-</div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Bootstrap JS necessário para o menu funcionar -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+      const input = this.value.toLowerCase();
+      const rows = document.querySelectorAll("table tbody tr");
 
-<script>
-  document.getElementById("searchInput").addEventListener("keyup", function () {
-    const input = this.value.toLowerCase();
-    const rows = document.querySelectorAll("table tbody tr");
-
-    rows.forEach(row => {
-      const nome = row.children[0].textContent.toLowerCase();
-      const ra = row.children[1].textContent.toLowerCase();
-      row.style.display = (nome.includes(input) || ra.includes(input)) ? "" : "none";
+      rows.forEach(row => {
+        const nome = row.children[0].textContent.toLowerCase();
+        const ra = row.children[1].textContent.toLowerCase();
+        row.style.display = (nome.includes(input) || ra.includes(input)) ? "" : "none";
+      });
     });
-  });
 
-  function imprimirTabela() {
-    const conteudo = document.querySelector(".scrollable-table").innerHTML;
-    const original = document.body.innerHTML;
-    document.body.innerHTML = conteudo;
-    window.print();
-    document.body.innerHTML = original;
-    location.reload();
-  }
-</script>
+    function imprimirTabela() {
+      const conteudo = document.querySelector(".scrollable-table").innerHTML;
+      const original = document.body.innerHTML;
+      document.body.innerHTML = conteudo;
+      window.print();
+      document.body.innerHTML = original;
+      location.reload();
+    }
+  </script>
 </body>
 </html>
