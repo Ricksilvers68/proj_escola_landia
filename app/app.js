@@ -1,9 +1,13 @@
 const express = require('express');
 const app = express();
+require('dotenv').config()//Para meu banco de dados não ficar visível a outras pessoas
+console.log("Variáveis carregadas:");
+console.log("DB_USER =", process.env.DB_USER);
 const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
+const DB = require('dotenv').config()
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -43,11 +47,12 @@ app.set('views', path.join(__dirname, '../views'));
 
 // Conexão com banco MySQL
 const db = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: 'Ss376Ss376',
-    database: 'crud_db'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 });
+
 
 // Rota principal (listar alunos)
 app.get('/', (req, res) => {
