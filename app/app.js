@@ -7,8 +7,29 @@ const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
-const DB = require('dotenv').config()
 
+// Lista de IPs permitidos
+const ipsPermitidos = [
+  '127.0.0.1', // localhost IPv4
+  '::1',       // localhost IPv6
+  '192.168.0.100', // IP local da sua máquina — substitua pelo correto!
+  '192.168.0.106', // outro IP permitido (anap)
+];
+
+// Middleware para bloquear IPs não autorizados
+app.use((req, res, next) => {
+  const ipCliente = req.ip.replace('::ffff:', ''); // Limpa IPv4 no formato IPv6
+  console.log('ip detectado', ipCliente)
+
+  if (ipsPermitidos.includes(ipCliente)) {
+    return next(); // Acesso autorizado
+  }
+
+  // Exibe página de acesso negado (pode personalizar)
+  res.status(403).send('<h3 style="font-family: sans-serif;">Acesso negado: Este dispositivo não está autorizado.</h3>');
+});
+
+//
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Configurar sessões
