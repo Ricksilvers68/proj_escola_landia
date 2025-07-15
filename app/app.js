@@ -12,8 +12,9 @@ const path = require('path');
 const ipsPermitidos = [
   '127.0.0.1', // localhost IPv4
   '::1',       // localhost IPv6
-  '192.168.0.100', // IP local da sua máquina — substitua pelo correto!
-  '192.168.0.106', // outro IP permitido (anap)
+  'xxx.xxx.x.xxx', // IP local da sua máquina — substitua pelo correto!
+  'xxx.xxx.x.xxx', // outro IP permitido (anap)
+  'xxx.xxx.x.xxx',
 ];
 
 // Middleware para bloquear IPs não autorizados
@@ -177,11 +178,18 @@ app.get('/buscar', (req, res) => {
 
 // Processar busca
 app.post('/buscar', async (req, res) => {
-    console.log(req.body)
     const { nome, ra, justificativa } = req.body;
 
+    const nomeLimpo = nome.trim().replace(/\s+/g, ' ');
+    const raLimpo = parseInt(ra.trim());
+
+    console.log('Dados recebidos do formulário:');
+    console.log('Nome:', JSON.stringify(nomeLimpo));
+    console.log('RA:', JSON.stringify(raLimpo));
+    console.log('Justificativa:', JSON.stringify(justificativa));
+
     const [results] = await db.promise().query(
-        'SELECT * FROM alunos WHERE nome = ? AND ra = ?', [nome, ra]
+        'SELECT * FROM alunos WHERE nome = ? AND ra = ?', [nomeLimpo, raLimpo]
     );
 
     if (results.length > 0) {
