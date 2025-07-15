@@ -17,6 +17,7 @@ const ipsPermitidos = [
   'xxx.xxx.x.xxx',
 ];
 
+
 // Middleware para bloquear IPs não autorizados
 app.use((req, res, next) => {
   const ipCliente = req.ip.replace('::ffff:', ''); // Limpa IPv4 no formato IPv6
