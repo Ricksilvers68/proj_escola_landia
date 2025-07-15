@@ -179,7 +179,8 @@ app.get('/buscar', (req, res) => {
 // Processar busca
 app.post('/buscar', async (req, res) => {
     const { nome, ra, justificativa } = req.body;
-
+//CÓDIGO ABAIXO FOI ADICIONADO PORQUÊ NO CELULAR NÃO ESTAVA ENCONTRANDO ALUNO POR CAUSA DOS ESPAÇOS.
+//UM JSON APARECERÁ NO CONSOLE PARA CONFIRMAR O FUNCIONAMENTO.
     const nomeLimpo = nome.trim().replace(/\s+/g, ' ');
     const raLimpo = parseInt(ra.trim());
 
