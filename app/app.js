@@ -14,7 +14,7 @@ const ipsComAcessoTotal = [
   '127.0.0.1',
   '::1',
   'xxx.xxx.x.xxx', // servidor meu/ou escola
-  'xxx.xxx.x.xxx', // meu celular
+  '192.168.0.149', // meu celular
 ];
 
 // 🎓 IP do terminal dos alunos (com acesso restrito)
