@@ -23,6 +23,14 @@
                 <label for="data_nascimento">Data de Nascimento</label>
                 <input type="date" class="form-control" name="data_nascimento" value="<%= aluno.data_nascimento.toISOString().split('T')[0] %>" required>
             </div>
+            <div class="form-group">
+            <label>Telefone Responsável 1:</label>
+  <input type="text" name="tel_responsavel_1" value="<%= aluno.tel_responsavel_1 || '' %>" placeholder="ex: 5511987654321">
+</div>
+<div class="form-group">
+  <label>Telefone Responsável 2:</label>
+  <input type="text" name="tel_responsavel_2" value="<%= aluno.tel_responsavel_2 || '' %>" placeholder="ex: 5511987654321">
+  </div>
             <button type="submit" class="btn btn-primary">Atualizar Aluno</button>
         </form>
         <a href="/" class="btn btn-secondary mt-3">Voltar</a>

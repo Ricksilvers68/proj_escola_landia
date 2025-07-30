@@ -16,6 +16,8 @@
         <th>RA</th>
         <th>Data/Hora</th>
         <th>Justificativa</th>
+        <th>tel_responsavel_1</th>
+        <th>tel_responsavel_2</th>
       </tr>
     </thead>
     <tbody>
@@ -25,6 +27,9 @@
           <td><%= entrada.ra %></td>
           <td><%= new Date(entrada.data_hora).toLocaleString() %></td>
           <td><%= entrada.justificativa || '-' %></td>
+          <td><%= entrada.tel_responsavel_1 || '-' %><br>
+  <%= entrada.tel_responsavel_2 || '-' %>
+</td>
         </tr>
       <% }) %>
     </tbody>
