@@ -66,7 +66,7 @@ http://localhost:3000
 
 
 ✅ Faça login para acessar a área principal:
-- *Usuário:* admin
+- *Usuário:* landia
 - *Senha:* 7237
 
 *(Edite para suas credenciais no arquivo app.js.)*
@@ -76,14 +76,13 @@ http://localhost:3000
 ## 📷 Telas
 - *Login:* Página para autenticação de usuários.
 - *Index:* Lista de alunos cadastrados, com opção de adição e edição.
-- *Buscar Aluno:* Página para verificar entradas e registros de alunos.
+- *Buscar Aluno:* Página para registrar entradas de alunos.
 
 ---
 
 ## 💡 Melhorias Futuras
-- 🔐 Autenticação com hash de senha e armazenamento no BD.
+✅ Inserir campos no banco tel_responsaveis.
 - 📱 Melhor layout para dispositivos móveis.
-- 📄 Exportação de relatórios para PDF.
-- 👥 Níveis de permissão para diferentes tipos de usuário.
+
 
 ---
