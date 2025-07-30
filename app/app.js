@@ -90,7 +90,8 @@ app.get('/', (req, res) => {
 });
 
 app.post('/add', (req, res) => {
-  const { nome, ra, data_nascimento } = req.body;
+  const { nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2 } = req.body;
+
   const queryVerifica = 'SELECT * FROM alunos WHERE nome = ? AND ra = ?';
   db.query(queryVerifica, [nome, ra], (err, resultados) => {
     if (err) throw err;
@@ -100,8 +101,12 @@ app.post('/add', (req, res) => {
         erro: 'Aluno com este nome e RA já está cadastrado!'
       });
     }
-    const queryInsere = 'INSERT INTO alunos (nome, ra, data_nascimento) VALUES (?, ?, ?)';
-    db.query(queryInsere, [nome, ra, data_nascimento], (err) => {
+
+    const queryInsere = `
+      INSERT INTO alunos (nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+    db.query(queryInsere, [nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2], (err) => {
       if (err) throw err;
       res.redirect('/');
     });
@@ -118,8 +123,14 @@ app.get('/edit/:id', (req, res) => {
 
 app.post('/update/:id', (req, res) => {
   const id = req.params.id;
-  const { nome, ra, data_nascimento } = req.body;
-  db.query('UPDATE alunos SET nome = ?, ra = ?, data_nascimento = ? WHERE id = ?', [nome, ra, data_nascimento, id], (err) => {
+  const { nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2 } = req.body;
+
+  const queryAtualiza = `
+    UPDATE alunos
+    SET nome = ?, ra = ?, data_nascimento = ?, tel_responsavel_1 = ?, tel_responsavel_2 = ?
+    WHERE id = ?
+  `;
+  db.query(queryAtualiza, [nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2, id], (err) => {
     if (err) throw err;
     res.redirect('/');
   });
@@ -146,7 +157,7 @@ app.post('/relatorio_data', async (req, res) => {
   const data_fim_completa = `${fim} 23:59:59`;
 
   const sql = `
-    SELECT entradas.*, alunos.nome, alunos.ra
+    SELECT entradas.*, alunos.nome, alunos.ra, alunos.tel_responsavel_1, alunos.tel_responsavel_2
     FROM entradas
     JOIN alunos ON entradas.aluno_id = alunos.id
     WHERE entradas.data_hora BETWEEN ? AND ?
@@ -216,7 +227,7 @@ app.get('/entradas', async (req, res) => {
   const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 0, 0, 0);
   const fim = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 23, 59, 59);
   const query = `
-    SELECT alunos.nome, alunos.ra, entradas.data_hora, entradas.justificativa
+    SELECT alunos.nome, alunos.ra, entradas.data_hora, entradas.justificativa, alunos.tel_responsavel_1, alunos.tel_responsavel_2
     FROM entradas
     JOIN alunos ON entradas.aluno_id = alunos.id
     WHERE entradas.data_hora BETWEEN ? AND ?
@@ -240,7 +251,7 @@ app.get('/entradas-mes', (req, res) => {
   const inicioDoProximoMes = `${proximoAno}-${proximoMesFormatado}-01 00:00:00`;
 
   const sql = `
-    SELECT entradas.*, alunos.nome, alunos.ra
+    SELECT entradas.*, alunos.nome, alunos.ra, alunos.tel_responsavel_1, alunos.tel_responsavel_2
     FROM entradas
     INNER JOIN alunos ON entradas.aluno_id = alunos.id
     WHERE entradas.data_hora >= ? AND entradas.data_hora < ?

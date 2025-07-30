@@ -28,6 +28,8 @@
           <th>Data</th>
           <th>Hora</th>
           <th>Justificativa</th>
+          <th>tel_responsavel_1</th>
+          <th>tel_responsavel_2</th>
         
         </tr>
       </thead>
@@ -39,6 +41,8 @@
             <td><%= new Date(entrada.data_hora).toISOString().split('T')[0] %></td>
             <td><%= new Date(entrada.data_hora).toTimeString().split(' ')[0] %></td>
             <td><%= entrada.justificativa || '-' %></td>
+            <td><%= entrada.tel_responsavel_1 || '' %></td>
+            <td><%= entrada.tel_responsavel_2 || '' %></td>
           </tr>
         <% }) %>
       </tbody>

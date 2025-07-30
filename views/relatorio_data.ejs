@@ -16,6 +16,11 @@
   <div class="container mt-5">
     <h1 class="mb-4 text-center">Relatório por Período</h1>
 
+    <!-- ✅ Exibe os dados brutos para depuração (remova depois de testar) 
+    <pre class="no-print bg-white p-3 border rounded">
+<%= JSON.stringify(entradas, null, 2) %>
+    </pre>-->
+
     <!-- Formulário de seleção de datas -->
     <form method="POST" action="/relatorio_data" class="row g-3 mb-5 no-print">
       <div class="col-md-5">
@@ -39,6 +44,8 @@
             <th>RA</th>
             <th>Data</th>
             <th>Justificativa</th>
+            <th>Telefone 1</th>
+            <th>Telefone 2</th>
           </tr>
         </thead>
         <tbody>
@@ -48,6 +55,8 @@
               <td><%= entrada.ra %></td>
               <td><%= new Date(entrada.data_hora).toLocaleString('pt-BR') %></td>
               <td><%= entrada.justificativa?.trim() || '-' %></td>
+              <td><%= entrada.tel_responsavel_1 || '-' %></td>
+              <td><%= entrada.tel_responsavel_2 || '-' %></td>
             </tr>
           <% }); %>
         </tbody>
