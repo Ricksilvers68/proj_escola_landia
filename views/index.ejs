@@ -84,7 +84,7 @@
           <!-- Botões de navegação -->
           <div class="d-flex flex-wrap gap-2 mt-2">
             <a href="/buscar" class="btn btn-info btn-sm">
-              <i class="bi bi-search"></i> Registrar Entrada
+              <i class="bi bi-person-walking"></i> Registrar Entrada Alunos
             </a>
             <a href="/entradas" class="btn btn-primary btn-sm">
               <i class="bi bi-list-ul"></i> Entradas do Dia
@@ -112,9 +112,10 @@
 
     <h2 class="mb-3 text-center">Lista de Alunos</h2>
 
-    <div class="mb-3">
-      <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Buscar por Nome ou RA..." style="border: 1px solid rgb(255, 0, 200);">
-    </div>
+<div class="position-relative mb-3">
+  <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
+  <input type="text" class="form-control form-control-sm ps-5" placeholder="Buscar por Nome ou RA..." style="border: 1px solid rgb(255, 0, 200);">
+</div>
 
     <% if (typeof erro !== 'undefined' && erro) { %>
       <div class="alert alert-danger"><%= erro %></div>
