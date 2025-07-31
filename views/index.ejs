@@ -112,12 +112,13 @@
 
     <h2 class="mb-3 text-center">Lista de Alunos</h2>
 
-<div class="position-relative mb-3">
+    <div class="position-relative mb-3">
   <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
-  <input type="text" class="form-control form-control-sm ps-5" placeholder="Buscar por Nome ou RA..." style="border: 1px solid rgb(255, 0, 200);">
+  <input type="text" class="form-control form-control-sm ps-5" id="searchInput"     placeholder="Buscar por Nome ou RA..." style="border: 1px solid rgb(255, 0, 200);">
 </div>
 
-    <% if (typeof erro !== 'undefined' && erro) { %>
+   
+<% if (typeof erro !== 'undefined' && erro) { %>
       <div class="alert alert-danger"><%= erro %></div>
     <% } %>
 
