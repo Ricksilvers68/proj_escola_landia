@@ -5,6 +5,7 @@ const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
+const {startVenom, sendMessage} = require('./whatsapp');
 
 // 🟢 Configurações iniciais
 const port = 3000;
@@ -196,6 +197,29 @@ app.post('/buscar', async (req, res) => {
       [aluno.id, horaAtual, justificativa || null]
     );
 
+    // Só envia se o horário for após o permitido
+const horaLimite = new Date();
+horaLimite.setHours(7, 3, 0); // exemplo: limite 07:03
+
+if (horaAtual > horaLimite) {
+  console.log('⏰ Hora atual:', horaAtual.toLocaleTimeString());
+  console.log('⏰ Hora limite:', horaLimite.toLocaleTimeString());
+
+  const mensagem = `Olá, ${aluno.nome} (RA: ${aluno.ra}) registrou entrada após o horário.\nJustificativa: ${justificativa || 'Nenhuma'}`;
+  const telefone = aluno.tel_responsavel_1 || aluno.tel_responsavel_2;
+
+  if (telefone) {
+    const numeroLimpo = telefone.replace(/\D/g, '');
+    console.log(`📨 Enviando para: ${numeroLimpo}`);
+    console.log(`📨 Mensagem: ${mensagem}`);
+    sendMessage(`${numeroLimpo}`, mensagem);
+  } else {
+    console.log('⚠️ Nenhum telefone cadastrado para este aluno.');
+  }
+} else {
+  console.log('🟢 Entrada no horário permitido. Nenhuma mensagem enviada.');
+}
+
     req.session.resultadoBusca = {
       aluno,
       horaAtual: horaAtual.toLocaleTimeString(),
@@ -295,4 +319,8 @@ app.get('/logout', (req, res) => {
 // 🚀 Inicia servidor
 app.listen(port, () => {
   console.log(`Tudo ok! Servidor rodando em http://localhost:${port}`);
+
+  //inicia o venom depois de subir o servidor
+startVenom();
 });
+

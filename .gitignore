@@ -23,3 +23,6 @@ tmp/
 # Arquivos do sistema
 .DS_Store
 Thumbs.db
+
+# token para autenticar whatsaap com uso do Venom-Bot
+tokens/
