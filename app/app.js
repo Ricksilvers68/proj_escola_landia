@@ -205,7 +205,7 @@ if (horaAtual > horaLimite) {
   console.log('⏰ Hora atual:', horaAtual.toLocaleTimeString());
   console.log('⏰ Hora limite:', horaLimite.toLocaleTimeString());
 
-  const mensagem = `Olá, ${aluno.nome} (RA: ${aluno.ra}) registrou entrada após o horário.\nJustificativa: ${justificativa || 'Nenhuma'}`;
+  const mensagem = `Olá responsável pelo(a) estudante:${aluno.nome} (RA: ${aluno.ra}) registrou entrada após o horário.\nJustificativa: ${justificativa || 'Nenhuma'}`;
   const telefone = aluno.tel_responsavel_1 || aluno.tel_responsavel_2;
 
   if (telefone) {
