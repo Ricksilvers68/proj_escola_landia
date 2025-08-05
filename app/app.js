@@ -13,8 +13,8 @@ const port = 3000;
 const ipsComAcessoTotal = [
   '127.0.0.1',
   '::1',
-  '192.168.2.100', // servidor meu/ou escola pc2 a direita
-  '192.168.2.101', // secretaria pc1 a esquerda
+  '192.168.2.101', // servidor meu/ou escola pc2 a direita
+  '192.168.2.100', // secretaria pc1 a esquerda
 ];
 
 // 🎓 IP do terminal dos alunos (com acesso restrito)
