@@ -8,6 +8,12 @@ function startVenom() {
     .create({
       session: 'session-escola',
       multidevice: true, // ou false, dependendo do seu WhatsApp
+      headless: true,
+      args:[
+        '--headless=new',
+        '--no-sandbox',
+        '--disable-setuid-sandbox'
+      ]
     })
     .then((client) => {
       clientInstance = client;

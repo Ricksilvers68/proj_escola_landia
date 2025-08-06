@@ -197,7 +197,7 @@ app.post('/buscar', async (req, res) => {
       [aluno.id, horaAtual, justificativa || null]
     );
 
-    // Só envia se o horário for após o permitido
+  // Só envia se o horário for após o permitido
 const horaLimite = new Date();
 horaLimite.setHours(7, 3, 0); // exemplo: limite 07:03
 
@@ -323,4 +323,3 @@ app.listen(port, () => {
   //inicia o venom depois de subir o servidor
 startVenom();
 });
-
