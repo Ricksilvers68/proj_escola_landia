@@ -26,3 +26,6 @@ Thumbs.db
 
 # token para autenticar whatsaap com uso do Venom-Bot
 tokens/
+
+# Arquivo de inicialização do pm2
+iniciar-servidor.bat
