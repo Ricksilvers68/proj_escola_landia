@@ -1,4 +1,4 @@
-const venom = require('venom-bot');
+/*const venom = require('venom-bot');
 const path = require('path');
 
 let clientInstance = null;
@@ -8,6 +8,10 @@ function startVenom() {
   return venom
     .create({
       session: 'session-escola',
+
+
+
+
       multidevice: true,
       headless: true,
       sessionPath:path.join(__dirname, 'session-escola'),

@@ -5,7 +5,7 @@ const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
-const {startVenom, sendMessage} = require('./whatsapp');
+//const {startVenom, sendMessage} = require('./whatsapp');
 
 // 🟢 Configurações iniciais
 const port = 3000;
@@ -19,7 +19,7 @@ const ipsComAcessoTotal = [
 ];
 
 // 🎓 IP do terminal dos alunos (com acesso restrito)
-const ipTerminalAluno = 'xxx.xxx.x.xxx'; //por enquanto está o pc a esquerda
+const ipTerminalAluno = '192.168.2.104'; //por enquanto está o pc a esquerda
 
 // 🔄 Arquivos estáticos (CSS, JS, imagens)
 app.use(express.static(path.join(__dirname, 'public')));
@@ -32,7 +32,7 @@ app.use((req, res, next) => {
   console.log(`📡 IP detectado: ${ipCliente} | Rota: ${req.path}`);
 
   // Terminal do aluno → só pode acessar /buscar e /resultado
-  if (ipCliente === ipTerminalAluno) {
+  if (ipCliente === ipTerminalAluno || ipBruto.includes(ipTerminalAluno)) {
     const rotasPermitidas = ['/buscar', '/resultado'];
     const rotaLiberada = rotasPermitidas.includes(req.path) || req.path.startsWith('/public');
     if (rotaLiberada) return next();
@@ -198,7 +198,7 @@ app.post('/buscar', async (req, res) => {
     );
 
   // Só envia se o horário for após o permitido
-const horaLimite = new Date();
+/*const horaLimite = new Date();
 horaLimite.setHours(7, 3, 0); // exemplo: limite 07:03
 
 if (horaAtual > horaLimite) {
@@ -218,7 +218,7 @@ if (horaAtual > horaLimite) {
   }
 } else {
   console.log('🟢 Entrada no horário permitido. Nenhuma mensagem enviada.');
-}
+}*/
 
     req.session.resultadoBusca = {
       aluno,
@@ -321,5 +321,5 @@ app.listen(port, () => {
   console.log(`Tudo ok! Servidor rodando em http://localhost:${port}`);
 
   //inicia o venom depois de subir o servidor
-startVenom();
+//startVenom();
 });
