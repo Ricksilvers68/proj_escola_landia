@@ -1,4 +1,5 @@
 const venom = require('venom-bot');
+const path = require('path');
 
 let clientInstance = null;
 
@@ -7,9 +8,10 @@ function startVenom() {
   return venom
     .create({
       session: 'session-escola',
-      multidevice: true, // ou false, dependendo do seu WhatsApp
+      multidevice: true,
       headless: true,
-      args:[
+      sessionPath:path.join(__dirname, 'session-escola'),
+      args: [
         '--headless=new',
         '--no-sandbox',
         '--disable-setuid-sandbox'
@@ -18,9 +20,25 @@ function startVenom() {
     .then((client) => {
       clientInstance = client;
       console.log('✅ Venom iniciado com sucesso!');
+
+      // Verificação de conexão a cada 60 segundos
+      setInterval(async () => {
+        try {
+          const conectado = await clientInstance.isConnected();
+          if (!conectado) {
+            console.warn('⚠️ Conexão Venom perdida. Reiniciando...');
+            process.exit(1); // PM2 reiniciará automaticamente
+          } else {
+            console.log('🔄 Venom ainda conectado:', new Date().toLocaleTimeString());
+          }
+        } catch (erro) {
+          console.error('Erro ao verificar conexão Venom:', erro);
+          process.exit(1);
+        }
+      }, 60000); // verifica a cada 1 minuto
     })
     .catch((err) => {
-      console.error('Erro ao iniciar Venom:', err);
+      console.error('❌ Erro ao iniciar Venom:', err);
     });
 }
 
