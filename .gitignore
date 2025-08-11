@@ -24,8 +24,16 @@ tmp/
 .DS_Store
 Thumbs.db
 
-# token para autenticar whatsaap com uso do Venom-Bot
+# token para autenticar whatsaap
 tokens/
 
 # Arquivo de inicialização do pm2
 iniciar-servidor.bat
+
+# whatssap web js
+whatsapp-session/
+.wwebjs_auth/
+.wwebjs_cache/
+
+
+
