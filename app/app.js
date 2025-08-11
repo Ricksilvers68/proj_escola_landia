@@ -7,8 +7,6 @@ const session = require('express-session');
 const path = require('path');
 const client = require('./whatsapp');
 
-// Inicializa o cliente WhatsApp
-client.initialize();
 client.on('ready', () => {
   console.log('✅ WhatsApp pronto para uso.');
 });

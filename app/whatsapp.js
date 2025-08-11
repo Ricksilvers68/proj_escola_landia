@@ -18,6 +18,8 @@ client.on('ready', () => {
   console.log('✅ WhatsApp conectado!');
 });
 
+client.initialize();
+
 async function sendMessage(numero, mensagem) {
   const numeroFormatado = numero.endsWith('@c.us') ? numero : `${numero}@c.us`;
   try {
