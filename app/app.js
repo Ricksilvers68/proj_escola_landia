@@ -219,8 +219,13 @@ app.post('/buscar', async (req, res) => {
         console.log('⏰ Hora atual:', horaAtual.toLocaleTimeString());
         console.log('⏰ Hora limite:', horaLimite.toLocaleTimeString());
 
-        const mensagem = `Olá responsável pelo(a) estudante: ${aluno.nome} (RA: ${aluno.ra}) registrou entrada após o horário.\nJustificativa: ${justificativa || 'Nenhuma'}`;
-        const telefone = aluno.tel_responsavel_1 || aluno.tel_responsavel_2;
+        const mensagem = `Olá responsável pelo(a) estudante:\n` +
+`*Nome:* ${aluno.nome}\n` +
+`*RA:* ${aluno.ra}\n` +
+`*Justificativa:* ${justificativa || 'Nenhuma'}`;
+
+const telefone = aluno.tel_responsavel_1 || aluno.tel_responsavel_2;
+
 
         if (telefone) {
           const numeroLimpo = telefone.replace(/\D/g, '');
