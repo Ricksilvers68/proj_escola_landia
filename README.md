@@ -66,8 +66,8 @@ http://localhost:3000
 
 
 ✅ Faça login para acessar a área principal:
-- *Usuário:* landia
-- *Senha:* 7237
+- *Usuário:* lxxxxx
+- *Senha:* *****
 
 *(Edite para suas credenciais no arquivo app.js.)*
 
