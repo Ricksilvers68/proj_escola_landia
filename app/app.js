@@ -15,15 +15,10 @@ client.on('ready', () => {
 const port = 3000;
 
 // 🔐 Lista de IPs com acesso completo
-const ipsComAcessoTotal = [
-  '127.0.0.1',
-  '::1',
-  '192.168.0.100', // servidor meu/ou escola pc2 a direita
-  'XXX.XXX.X.XXX', // secretaria pc1 a esquerda
-];
+const ipsComAcessoTotal = process.env.FULL_ACCESS_IPS.split(',');
 
 // 🎓 IP do terminal dos alunos (com acesso restrito)
-const ipTerminalAluno = '192.168.0.149'; //por enquanto está o pc a esquerda
+const ipTerminalAluno = process.env.RESTRICTED_IPS.split(','); //por enquanto está o pc a esquerda
 
 // 🔄 Arquivos estáticos (CSS, JS, imagens)
 app.use(express.static(path.join(__dirname, 'public')));
