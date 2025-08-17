@@ -18,12 +18,12 @@ const port = 3000;
 const ipsComAcessoTotal = [
   '127.0.0.1',
   '::1',
-  '192.168.2.101', // servidor meu/ou escola pc2 a direita
-  '192.168.2.100', // secretaria pc1 a esquerda
+  '192.168.0.100', // servidor meu/ou escola pc2 a direita
+  'XXX.XXX.X.XXX', // secretaria pc1 a esquerda
 ];
 
 // 🎓 IP do terminal dos alunos (com acesso restrito)
-const ipTerminalAluno = '192.168.2.104'; //por enquanto está o pc a esquerda
+const ipTerminalAluno = '192.168.0.149'; //por enquanto está o pc a esquerda
 
 // 🔄 Arquivos estáticos (CSS, JS, imagens)
 app.use(express.static(path.join(__dirname, 'public')));
@@ -55,7 +55,7 @@ app.use((req, res, next) => {
 
 // 🔐 Sessões
 app.use(session({
-  secret: 'segredo-supersecreto',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
 }));
