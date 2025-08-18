@@ -215,8 +215,8 @@ app.post('/buscar', async (req, res) => {
         console.log('⏰ Hora limite:', horaLimite.toLocaleTimeString());
 
         const mensagem = `Olá responsável pelo(a) estudante:\n` +
-`*Nome:* ${aluno.nome}\n` +
-`*RA:* ${aluno.ra}\n`+
+`*${aluno.nome}*\n` +
+`RA: *${aluno.ra}*\n`+
 `Ele(a) registrou entrada após o horário\n`+
 `*Justificativa:* ${justificativa || 'Nenhuma'}`;
 
