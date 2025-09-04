@@ -11,7 +11,7 @@ Possibilita:
 ---
 
 ## ⚡ Funcionalidades
-- ✅ CRUD de alunos (nome, RA, data de nascimento)  
+- ✅ CRUD de alunos (nome, RA, data de nascimento, números de telefones dos responsáveis dos alunos)  
 - ✅ Sistema de autenticação simples para acessar a área principal (index)  
 - ✅ Busca de alunos por nome e RA  
 - ✅ Registro de entrada de alunos e exibição de horários registrados  
@@ -24,7 +24,10 @@ Possibilita:
 - *MySQL* (usando mysql2)
 - *EJS* para as views
 - *Bootstrap 4.5* para layout
-- *Bootstrap Icons* para ícones
+- *Html*
+- *Css*
+- *JavaScript*
+- *Bootstrap*
 - *express-session* para controle de sessão
 
 ---
@@ -75,14 +78,13 @@ http://localhost:3000
 
 ## 📷 Telas
 - *Login:* Página para autenticação de usuários.
-- *Index:* Lista de alunos cadastrados, com opção de adição e edição.
+- *Index:* Lista de alunos cadastrados, com opção de adicionar, editar e excluir alunos.
 - *Buscar Aluno:* Página para registrar entradas de alunos.
 
 ---
 
 ## 💡 Melhorias Futuras
-✅ Inserir campos no banco tel_responsaveis.
-- 📱 Melhor layout para dispositivos móveis.
+
 
 
 ---
