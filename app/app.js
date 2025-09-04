@@ -102,10 +102,8 @@ app.post('/add', (req, res) => {
       });
     }
 
-    const queryInsere = `
-      INSERT INTO alunos (nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2)
-      VALUES (?, ?, ?, ?, ?)
-    `;
+    const queryInsere = `INSERT INTO alunos (nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2)
+      VALUES (?, ?, ?, ?, ?)`;
     db.query(queryInsere, [nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2], (err) => {
       if (err) throw err;
       res.redirect('/');
