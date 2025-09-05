@@ -1,4 +1,4 @@
-# Controle de Alunos - Escola Prof. Landia Santos Batista
+# Controle de Pontualidade Escolar - Escola Estadual Professora Landia Santos Batista
 
 ### 📋 Descrição
 Esta é uma aplicação de *CRUD de Alunos* com autenticação simples, criada em *Node.js, **Express, **EJS, **MySQL* e *Bootstrap*.  
