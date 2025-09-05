@@ -159,8 +159,7 @@ app.post('/relatorio_data', async (req, res) => {
     FROM entradas
     JOIN alunos ON entradas.aluno_id = alunos.id
     WHERE entradas.data_hora BETWEEN ? AND ?
-    ORDER BY entradas.data_hora ASC
-  `;
+    ORDER BY entradas.data_hora ASC`;
   try {
     const [entradas] = await db.promise().query(sql, [data_inicio_completa, data_fim_completa]);
     res.render('relatorio_data', { entradas });
@@ -213,12 +212,12 @@ app.post('/buscar', async (req, res) => {
         console.log('⏰ Hora limite:', horaLimite.toLocaleTimeString());
 
         const mensagem = `Olá responsável pelo(a) estudante:\n` +
-`*${aluno.nome}*\n` +
-`RA: *${aluno.ra}*\n`+
-`Ele(a) registrou entrada após o horário\n`+
-`*Justificativa:* ${justificativa || 'Nenhuma'}`;
+          `*${aluno.nome}*\n` +
+          `RA: *${aluno.ra}*\n` +
+          `Ele(a) registrou entrada após o horário\n` +
+          `*Justificativa:* ${justificativa || 'Nenhuma'}`;
 
-const telefone = aluno.tel_responsavel_1 || aluno.tel_responsavel_2;
+        const telefone = aluno.tel_responsavel_1 || aluno.tel_responsavel_2;
 
 
         if (telefone) {
@@ -289,22 +288,32 @@ app.get('/entradas-mes', (req, res) => {
   const proximoMesFormatado = proximoMes > 12 ? '01' : (proximoMes < 10 ? `0${proximoMes}` : `${proximoMes}`);
   const inicioDoProximoMes = `${proximoAno}-${proximoMesFormatado}-01 00:00:00`;
 
-  const sql = `
+  const busca = req.query.busca;
+
+  let sql = `
     SELECT entradas.*, alunos.nome, alunos.ra, alunos.tel_responsavel_1, alunos.tel_responsavel_2
     FROM entradas
     INNER JOIN alunos ON entradas.aluno_id = alunos.id
     WHERE entradas.data_hora >= ? AND entradas.data_hora < ?
-    ORDER BY alunos.nome ASC, entradas.data_hora ASC
   `;
+  const params = [inicioDoMes, inicioDoProximoMes];
 
-  db.query(sql, [inicioDoMes, inicioDoProximoMes], (err, resultados) => {
+  if (busca) {
+    sql += ` AND (alunos.nome LIKE ? OR alunos.ra LIKE ?)`;
+    params.push(`%${busca}%`, `%${busca}%`);
+  }
+
+  sql += ` ORDER BY alunos.nome ASC, entradas.data_hora ASC`;
+
+  db.query(sql, params, (err, resultados) => {
     if (err) {
       console.error('Erro ao buscar entradas do mês:', err);
       return res.status(500).send('Erro no servidor');
     }
-    res.render('entradas_mes', { entradas: resultados });
+    res.render('entradas_mes', { entradas: resultados, busca });
   });
 });
+
 
 // 🔐 Login
 app.get('/login', (req, res) => {

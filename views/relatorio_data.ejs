@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <title>Relatório por Período</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <style>
     @media print {
       .no-print {
@@ -12,17 +14,13 @@
     }
   </style>
 </head>
+
 <body class="bg-light">
   <div class="container mt-5">
     <h1 class="mb-4 text-center">Relatório por Período</h1>
 
-    <!-- ✅ Exibe os dados brutos para depuração (remova depois de testar) 
-    <pre class="no-print bg-white p-3 border rounded">
-<%= JSON.stringify(entradas, null, 2) %>
-    </pre>-->
-
     <!-- Formulário de seleção de datas -->
-    <form method="POST" action="/relatorio_data" class="row g-3 mb-5 no-print">
+    <form method="POST" action="/relatorio_data" class="row g-3 mb-3 no-print">
       <div class="col-md-5">
         <label for="inicio" class="form-label">Data Inicial:</label>
         <input type="date" id="inicio" name="inicio" class="form-control" required>
@@ -36,8 +34,16 @@
       </div>
     </form>
 
-    <% if (entradas && entradas.length > 0) { %>
-      <table class="table table-bordered table-hover">
+    <% if (entradas && entradas.length> 0) { %>
+
+      <!-- Campo de busca local -->
+      <div class="position-relative mb-3 no-print">
+        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
+        <input type="text" class="form-control form-control-sm ps-5" id="searchInput"
+          placeholder="Buscar por Nome ou RA..." style="border: 1px solid rgb(255, 0, 200);">
+      </div>
+
+      <table class="table table-bordered table-hover" id="tabela-entradas">
         <thead class="table-secondary">
           <tr>
             <th>Nome</th>
@@ -49,25 +55,58 @@
           </tr>
         </thead>
         <tbody>
-          <% entradas.forEach(entrada => { %>
+          <% entradas.forEach(entrada=> { %>
             <tr>
-              <td><%= entrada.nome %></td>
-              <td><%= entrada.ra %></td>
-              <td><%= new Date(entrada.data_hora).toLocaleString('pt-BR') %></td>
-              <td><%= entrada.justificativa?.trim() || '-' %></td>
-              <td><%= entrada.tel_responsavel_1 || '-' %></td>
-              <td><%= entrada.tel_responsavel_2 || '-' %></td>
+              <td>
+                <%= entrada.nome %>
+              </td>
+              <td>
+                <%= entrada.ra %>
+              </td>
+              <td>
+                <%= new Date(entrada.data_hora).toLocaleString('pt-BR') %>
+              </td>
+              <td>
+                <%= entrada.justificativa?.trim() || '-' %>
+              </td>
+              <td>
+                <%= entrada.tel_responsavel_1 || '-' %>
+              </td>
+              <td>
+                <%= entrada.tel_responsavel_2 || '-' %>
+              </td>
             </tr>
-          <% }); %>
+            <% }); %>
         </tbody>
       </table>
 
       <div class="text-center no-print mt-4">
-        <button onclick="window.print()" class="btn btn-success">Imprimir</button>
+        <button onclick="window.print()" class="btn btn-success no-print">Imprimir</button>
       </div>
-    <% } else if (typeof entradas !== 'undefined') { %>
-      <p class="text-muted text-center">Nenhuma entrada encontrada para esse período.</p>
-    <% } %>
+
+      <% } else if (typeof entradas !=='undefined' ) { %>
+        <p class="text-muted text-center">Nenhuma entrada encontrada para esse período.</p>
+        <% } %>
+
   </div>
+
+  <!-- Script para filtro local -->
+  <script>
+    const filtroInput = document.getElementById('searchInput');
+    const tabela = document.getElementById('tabela-entradas');
+    const linhas = tabela?.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+    if (filtroInput) {
+      filtroInput.addEventListener('input', () => {
+        const termo = filtroInput.value.toLowerCase();
+        for (let linha of linhas) {
+          const nome = linha.cells[0].textContent.toLowerCase();
+          const ra = linha.cells[1].textContent.toLowerCase();
+          linha.style.display = (nome.includes(termo) || ra.includes(termo)) ? '' : 'none';
+        }
+      });
+    }
+  </script>
 </body>
+
 </html>
