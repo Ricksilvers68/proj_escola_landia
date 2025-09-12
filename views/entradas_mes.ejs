@@ -45,7 +45,7 @@
       <tbody>
         <% entradas.forEach(entrada => { %>
           <tr>
-            <td><%= entrada.nome %></td>
+            <td><%= entrada.nome ? String(entrada.nome).toUpperCase() : '-' %></td>
             <td><%= entrada.ra %></td>
             <td><%= new Date(entrada.data_hora).toISOString().split('T')[0] %></td>
             <td><%= new Date(entrada.data_hora).toTimeString().split(' ')[0] %></td>

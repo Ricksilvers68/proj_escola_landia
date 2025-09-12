@@ -231,6 +231,7 @@ app.get('/entradas', async (req, res) => {
     ORDER BY alunos.nome ASC, entradas.data_hora ASC
   `;
   const [entradas] = await db.promise().query(query, [inicio, fim]);
+  console.log(entradas.map(e => e.nome));
   res.render('entradas', { entradas });
 });
 
