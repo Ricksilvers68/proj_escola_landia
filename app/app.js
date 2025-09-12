@@ -5,20 +5,15 @@ const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
-const client = require('./whatsapp');
-
-client.on('ready', () => {
-  console.log('✅ WhatsApp pronto para uso.');
-});
 
 // 🟢 Configurações iniciais
 const port = 3000;
 
 // 🔐 Lista de IPs com acesso completo
-const ipsComAcessoTotal = process.env.FULL_ACCESS_IPS.split(',');
+const ipsComAcessoTotal = process.env.FULL_ACCESS_IPS.split(',').map(ip => ip.trim());
 
 // 🎓 IP do terminal dos alunos (com acesso restrito)
-const ipTerminalAluno = process.env.RESTRICTED_IPS.split(','); //por enquanto está o pc a esquerda
+const ipTerminalAluno = process.env.RESTRICTED_IPS.split(','); // por enquanto está o pc a esquerda
 
 // 🔄 Arquivos estáticos (CSS, JS, imagens)
 app.use(express.static(path.join(__dirname, 'public')));
@@ -31,13 +26,13 @@ app.use((req, res, next) => {
   console.log(`📡 IP detectado: ${ipCliente} | Rota: ${req.path}`);
 
   // Terminal do aluno → só pode acessar /buscar e /resultado
-  if (ipCliente === ipTerminalAluno || ipBruto.includes(ipTerminalAluno)) {
-    const rotasPermitidas = ['/buscar', '/resultado'];
-    const rotaLiberada = rotasPermitidas.includes(req.path) || req.path.startsWith('/public');
-    if (rotaLiberada) return next();
+  if (ipTerminalAluno.includes(ipCliente)) {
+  const rotasPermitidas = ['/buscar', '/resultado'];
+  const rotaLiberada = rotasPermitidas.includes(req.path) || req.path.startsWith('/public');
+  if (rotaLiberada) return next();
 
-    return res.status(403).send('<h3 style="font-family: sans-serif;">Acesso restrito: Essa página não está liberada neste terminal.</h3>');
-  }
+  return res.status(403).send('<h3 style="font-family: sans-serif;">Acesso restrito: Essa página não está liberada neste terminal.</h3>');
+}
 
   // IP com acesso total
   if (ipsComAcessoTotal.includes(ipCliente)) {
@@ -102,8 +97,10 @@ app.post('/add', (req, res) => {
       });
     }
 
-    const queryInsere = `INSERT INTO alunos (nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2)
-      VALUES (?, ?, ?, ?, ?)`;
+    const queryInsere = `
+      INSERT INTO alunos (nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2)
+      VALUES (?, ?, ?, ?, ?)
+    `;
     db.query(queryInsere, [nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2], (err) => {
       if (err) throw err;
       res.redirect('/');
@@ -159,7 +156,8 @@ app.post('/relatorio_data', async (req, res) => {
     FROM entradas
     JOIN alunos ON entradas.aluno_id = alunos.id
     WHERE entradas.data_hora BETWEEN ? AND ?
-    ORDER BY entradas.data_hora ASC`;
+    ORDER BY entradas.data_hora ASC
+  `;
   try {
     const [entradas] = await db.promise().query(sql, [data_inicio_completa, data_fim_completa]);
     res.render('relatorio_data', { entradas });
@@ -193,46 +191,7 @@ app.post('/buscar', async (req, res) => {
       [aluno.id, horaAtual, justificativa || null]
     );
 
-    // Função para enviar mensagem
-    function sendMessage(numero, mensagem) {
-      const numeroComDdd = numero.includes('@c.us') ? numero : `${numero}@c.us`;
-      client.sendMessage(numeroComDdd, mensagem)
-        .then(() => console.log(`📨 Mensagem enviada para ${numero}`))
-        .catch(err => console.error(`❌ Erro ao enviar para ${numero}:`, err));
-    }
-
-    // Lógica para verificar hora e enviar
-    function verificarEntrada(aluno, justificativa) {
-      const horaAtual = new Date();
-      const horaLimite = new Date();
-      horaLimite.setHours(7, 3, 0); // Limite 07:03
-
-      if (horaAtual > horaLimite) {
-        console.log('⏰ Hora atual:', horaAtual.toLocaleTimeString());
-        console.log('⏰ Hora limite:', horaLimite.toLocaleTimeString());
-
-        const mensagem = `Olá responsável pelo(a) estudante:\n` +
-          `*${aluno.nome}*\n` +
-          `RA: *${aluno.ra}*\n` +
-          `Ele(a) registrou entrada após o horário\n` +
-          `*Justificativa:* ${justificativa || 'Nenhuma'}`;
-
-        const telefone = aluno.tel_responsavel_1 || aluno.tel_responsavel_2;
-
-
-        if (telefone) {
-          const numeroLimpo = telefone.replace(/\D/g, '');
-          console.log(`📨 Enviando para: ${numeroLimpo}`);
-          sendMessage(numeroLimpo, mensagem);
-        } else {
-          console.log('⚠️ Nenhum telefone cadastrado para este aluno.');
-        }
-      } else {
-        console.log('🟢 Entrada no horário permitido. Nenhuma mensagem enviada.');
-      }
-    }
-
-    verificarEntrada(aluno, justificativa);
+    console.log('✅ Entrada registrada no banco.');
 
     req.session.resultadoBusca = {
       aluno,
@@ -288,32 +247,22 @@ app.get('/entradas-mes', (req, res) => {
   const proximoMesFormatado = proximoMes > 12 ? '01' : (proximoMes < 10 ? `0${proximoMes}` : `${proximoMes}`);
   const inicioDoProximoMes = `${proximoAno}-${proximoMesFormatado}-01 00:00:00`;
 
-  const busca = req.query.busca;
-
-  let sql = `
+  const sql = `
     SELECT entradas.*, alunos.nome, alunos.ra, alunos.tel_responsavel_1, alunos.tel_responsavel_2
     FROM entradas
     INNER JOIN alunos ON entradas.aluno_id = alunos.id
     WHERE entradas.data_hora >= ? AND entradas.data_hora < ?
+    ORDER BY alunos.nome ASC, entradas.data_hora ASC
   `;
-  const params = [inicioDoMes, inicioDoProximoMes];
 
-  if (busca) {
-    sql += ` AND (alunos.nome LIKE ? OR alunos.ra LIKE ?)`;
-    params.push(`%${busca}%`, `%${busca}%`);
-  }
-
-  sql += ` ORDER BY alunos.nome ASC, entradas.data_hora ASC`;
-
-  db.query(sql, params, (err, resultados) => {
+  db.query(sql, [inicioDoMes, inicioDoProximoMes], (err, resultados) => {
     if (err) {
       console.error('Erro ao buscar entradas do mês:', err);
       return res.status(500).send('Erro no servidor');
     }
-    res.render('entradas_mes', { entradas: resultados, busca });
+    res.render('entradas_mes', { entradas: resultados });
   });
 });
-
 
 // 🔐 Login
 app.get('/login', (req, res) => {
@@ -341,6 +290,6 @@ app.get('/logout', (req, res) => {
 });
 
 // 🚀 Inicia servidor
-app.listen(port, () => {
-  console.log(`Tudo ok! Servidor rodando em http://localhost:${port}`);
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Tudo ok! Servidor rodando ${port}`);
 });
