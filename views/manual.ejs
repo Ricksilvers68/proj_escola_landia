@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Manual do Sistema</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="container mt-4">
+      
+
+    <div class="text-center">
+        <h1 class="mb-4" style="padding-bottom: 50px;">📘 Manual do Sistema</h1>
+      <p style="padding-bottom: 50px;">Bem-vindo ao sistema de <strong>Controle de Pontualidade Escolar</strong>.</p>
+
+      <p> Para acessar clique no <b>ícone da área de trabalho</b> ou digite: http://localhost:3000</p>
+      <img src="/images/acesso1.png" style="padding-bottom: 50px;" class="img-fluid mb-3" alt="Exemplo de tela de cadastro">
+      <h3>🔑 Acesso</h3>
+      <p>O sistema pode ser acessado somente por usuários autorizados.</p>
+        <img src="/images/index.png" style="center" class="img-fluid mb-3" alt="Exemplo de tela de cadastro">
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+
+      <h3 style="padding-bottom: 50px;"> Tela principal</h3>
+      <p>Ao inserir nome, RA, data de Nascimento e números de telefones, basta clicar em <b>Adicionar</b> para inserir um novo aluno no banco de dados e automaticamente na lista geral</p>
+      <p>Clicando em <b>Editar</b> é possível atualizar os dados do aluno como também em <b>Excluir</b> para deletar.</p>
+      <img src="/images/lista.png" class="img-fluid mb-3" alt="Exemplo de tela de cadastro">
+
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      
+
+      <h3> Registrar entrada</h3>
+      <p>Ao clicar em  <a href="/buscar" class="btn btn-info btn-sm">
+              <i class="bi bi-person-walking"></i> Registrar Entrada Alunos
+            </a>, o sistema apresentará a seguinte tela. Basta digitar nome completo, o RA do aluno e o motivo do atraso no campo "Justificativa". O sistema irá retornar uma mensagem com os dados e horário do registro.</p>
+      
+      <br>
+      
+      <img src="/images/registro2.png" class="img-fluid mb-3" alt="Exemplo de tela de cadastro">
+      <br>
+      <br>
+      <br>
+      <br>
+      <h3> tela retorno após registro:</h3>
+      <br>
+      <br>
+      <br>
+      <img src="/images/registro_efetuado.png" class="img-fluid mb-3" alt="Exemplo de tela de cadastro">
+
+      <br>
+      <br>
+      <br>
+      <br>
+
+
+      <h3>📊 Relatórios</h3>
+      <br>
+      <br>
+      <ul>
+        <li style="padding: 5px;"><a href="/entradas" class="btn btn-primary btn-sm">
+              <i class="bi bi-list-ul"></i> Entradas do Dia
+            </a>  mostra todas as entradas registradas no dia atual.</li>
+        <li style="padding: 5px;"><a href="/entradas-mes" class="btn btn-outline-info btn-sm">
+              <i class="bi bi-calendar-month"></i> Entradas do Mês
+            </a>  lista de todas as entradas do mês atual.</li>
+         <li style="padding: 5px;"><a href="/relatorio_data" class="btn btn-outline-warning btn-sm">
+              <i class="bi bi-calendar-month"></i> Relatório por Data
+            </a>  lista de todas as entradas em intervalos.</li>
+      </ul>
+      <br>
+      <br>
+      <br>
+      <h3> tela para visualização e impressão de registros:</h3>
+      <img src="/images/relatorio_impressão.png" class="img-fluid mb-3" alt="Exemplo de tela de cadastro">
+    </div>
+      
+      
+
+      <div class="text-center mt-4" style="padding-bottom: 80px;">
+        <a href="/" class="btn btn-info">Voltar ao Início</a>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

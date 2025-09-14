@@ -218,6 +218,11 @@ app.get('/resultado', (req, res) => {
   res.render('resultado', resultado);
 });
 
+// 📘 Manual do sistema
+app.get('/manual', (req, res) => {
+  res.render('manual');
+});
+
 // 📆 Entradas do dia
 app.get('/entradas', async (req, res) => {
   const hoje = new Date();
