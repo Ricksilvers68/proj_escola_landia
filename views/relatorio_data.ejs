@@ -13,6 +13,20 @@
       }
     }
   </style>
+  <style>
+  #btnTopo {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 999;
+    width: 50px;
+    height: 50px;
+    font-size: 22px;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
 </head>
 
 <body class="bg-light">
@@ -105,6 +119,29 @@
       });
     }
   </script>
+  <script>
+  // Exibe o botão quando rolar a página
+  window.onscroll = function() { scrollFunction() };
+
+  function scrollFunction() {
+    const btn = document.getElementById("btnTopo");
+    if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+      btn.style.display = "flex";
+    } else {
+      btn.style.display = "none";
+    }
+  }
+
+  // Voltar suavemente ao topo
+  function voltarAoTopo() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+ <!-- Botão flutuante -->
+<button onclick="voltarAoTopo()" id="btnTopo" class="btn btn-info rounded-circle shadow">
+  <i class="bi bi-arrow-up"></i>
+</button>
 </body>
 
 </html>
