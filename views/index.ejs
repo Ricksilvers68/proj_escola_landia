@@ -157,7 +157,7 @@
                     <%= aluno.data_nascimento.toISOString().split('T')[0] %>
                   </td>
                   <td>
-                    <a href="/edit/<%= aluno.id %>" class="btn btn-sm btn-info">Editar</a>
+                    <a href="/edit/<%= aluno.id %>" class="btn btn-sm btn-info">Editar/Visualizar</a>
                     <form action="/delete/<%= aluno.id %>" method="POST" style="display:inline;"
                       onsubmit="return confirm('Tem certeza que deseja excluir este aluno?');">
                       <button type="submit" class="btn btn-sm btn-light">Excluir</button>
