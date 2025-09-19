@@ -67,11 +67,11 @@
           <form action="/add" method="POST" class="row g-2 align-items-end w-100">
             <div class="col-md-2">
               <label for="nome" class="form-label"></label>
-              <input type="text" id="nome" name="nome" class="form-control" placeholder="Digite o nome" required>
+              <input type="text" pattern="[A-Za-zÀ-ÿ\s]+" title="Digite apenas letras" oninput="this.value = this.value.replace(/[^A-Za-zÀ-ÿ\s]/g, '')" id="nome" name="nome" class="form-control" placeholder="Digite o nome" required>
             </div>
             <div class="col-md-2">
               <label for="ra" class="form-label"></label>
-              <input type="number" id="ra" name="ra" class="form-control" placeholder="RA" required>
+              <input type="text" pattern="\d*" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" id="ra" name="ra" class="form-control" placeholder="RA...9 dígitos" maxlength="9" required>
             </div>
             <div class="col-md-2">
               <label for="data_nascimento" class="form-label"></label>
@@ -124,7 +124,7 @@
     <div class="position-relative mb-3">
       <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
       <input type="text" class="form-control form-control-sm ps-5" id="searchInput"
-        placeholder="Buscar por Nome ou RA..." style="border: 1px solid rgb(255, 0, 200);">
+        placeholder="Buscar por Nome ou RA..." style="border: 1px solid rgb(0, 119, 255);">
     </div>
 
 
