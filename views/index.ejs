@@ -161,7 +161,7 @@
                     <%= aluno.ra %>
                   </td>
                   <td>
-                    <%= aluno.data_nascimento.toISOString().split('T')[0] %>
+                    <%= new Date(aluno.data_nascimento).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) %>
                   </td>
                   <td>
                     <a href="/edit/<%= aluno.id %>" class="btn btn-sm btn-info">Visualizar/Editar</a>

@@ -295,7 +295,40 @@ app.get('/logout', (req, res) => {
   });
 });
 
-// 🚀 Inicia servidor
+// 📊 API para dados do gráfico de entradas
+app.get('/api/entradas-chart', async (req, res) => {
+  try {
+    // Consulta para contar as entradas por dia nos últimos 30 dias
+    const sql = `
+      SELECT DATE(data_hora) as dia, COUNT(*) as total
+      FROM entradas
+      WHERE data_hora >= CURDATE() - INTERVAL 30 DAY
+      GROUP BY DATE(data_hora)
+      ORDER BY dia ASC;
+    `;
+    const [results] = await db.promise().query(sql);
+
+    // Filtra resultados onde a data possa ser nula ou inválida, evitando o erro NaN/NaN
+    const validResults = results.filter(row => row && row.dia);
+
+    // Formata os dados para serem usados pelo Chart.js
+    const labels = validResults.map(row => {
+      // O MySQL retorna a data no formato YYYY-MM-DD.
+      // Vamos converter para um objeto Date para formatar corretamente em DD/MM.
+      // Adicionar 'T00:00:00' para evitar problemas de fuso horário.
+      const data = new Date(row.dia + 'T00:00:00');
+      return `${data.getDate().toString().padStart(2, '0')}/${(data.getMonth() + 1).toString().padStart(2, '0')}`;
+    });
+    const data = validResults.map(row => row.total);
+
+    res.json({ labels, data });
+  } catch (error) {
+    console.error('Erro ao buscar dados para o gráfico:', error);
+    res.status(500).json({ error: 'Erro ao buscar dados para o gráfico' });
+  }
+});
+
+// ��� Inicia servidor
 app.listen(port, '0.0.0.0', () => {
   console.log(`Tudo ok! Servidor rodando ${port}`);
 });

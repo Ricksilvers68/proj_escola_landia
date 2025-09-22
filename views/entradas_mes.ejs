@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Entradas do Mês</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body class="container mt-4">
@@ -31,7 +32,14 @@
   }
 </style>
 
-  <h2 class="mb-4">Entradas do Mês</h2>
+  <!-- Cabeçalho da página com título e botão de voltar -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Entradas do Mês</h2>
+    <div class="no-print">
+      <a href="/" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Voltar</a>
+        </a>
+    </div>
+  </div>
 
   <form method="get" action="/entradas-mes" class="row g-2 mb-3">
 
@@ -62,8 +70,8 @@
           <tr>
             <td><%= entrada.nome ? String(entrada.nome).toUpperCase() : '-' %></td>
             <td><%= entrada.ra %></td>
-            <td><%= new Date(entrada.data_hora).toISOString().split('T')[0] %></td>
-            <td><%= new Date(entrada.data_hora).toTimeString().split(' ')[0] %></td>
+            <td><%= new Date(entrada.data_hora).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) %></td>
+            <td><%= new Date(entrada.data_hora).toLocaleTimeString('pt-BR', { timeZone: 'UTC' }) %></td>
             <td><%= entrada.justificativa || '-' %></td>
             <td><%= entrada.tel_responsavel_1 || '' %></td>
             <td><%= entrada.tel_responsavel_2 || '' %></td>
@@ -73,9 +81,16 @@
     </table>
   <% } %>
 
-                <button class="btn btn-info no-print" onClick="window.print()">Imprimir Lista</button>
-            </div>
-            <script>
+  <!-- Container para o gráfico -->
+  <div class="chart-container mt-4 mb-4 no-print">
+    <h4 class="text-center">Entradas por Dia no Mês</h4>
+    <canvas id="entradasMesChart"></canvas>
+  </div>
+
+  <!-- Botão de imprimir -->
+    <div class="mt-3 no-print">
+        <button class="btn btn-info" onClick="window.print()"><i class="bi bi-printer"></i> Imprimir Lista</button>
+    <script>
     const filtroInput = document.getElementById('searchInput');
     const tabela = document.getElementById('tabela-entradas');
     const linhas = tabela?.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
@@ -91,6 +106,50 @@
       });
     }
   </script>
+
+  <!-- Código JavaScript para gerar o gráfico -->
+  <% if (entradas && entradas.length > 0) { %>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Pega os dados das entradas que o servidor enviou para o EJS
+      const entradas = <%- JSON.stringify(entradas) %>;
+
+      // Agrupa e conta as entradas por dia
+      const contagemPorDia = entradas.reduce((acc, entrada) => {
+        const data = new Date(entrada.data_hora).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+        acc[data] = (acc[data] || 0) + 1;
+        return acc;
+      }, {});
+
+      // Ordena as datas para que o gráfico fique em ordem cronológica
+      const labelsOrdenados = Object.keys(contagemPorDia).sort((a, b) => {
+          const [diaA, mesA, anoA] = a.split('/');
+          const [diaB, mesB, anoB] = b.split('/');
+          return new Date(`${anoA}-${mesA}-${diaA}`) - new Date(`${anoB}-${mesB}-${diaB}`);
+      });
+
+      const dataOrdenada = labelsOrdenados.map(label => contagemPorDia[label]);
+
+      const ctx = document.getElementById('entradasMesChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labelsOrdenados,
+          datasets: [{
+            label: 'Total de Entradas por Dia',
+            data: dataOrdenada,
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } }, responsive: true }
+      });
+    });
+  </script>
+  <% } %>
+
+  <!-- Script para filtro na tabela -->
 
 <script>
   // Exibe o botão quando rolar a página
