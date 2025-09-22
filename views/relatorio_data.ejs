@@ -11,7 +11,23 @@
   <style>
     @media print {
       .no-print {
-        display: none;
+        display: none !important;
+      }
+      /* Esconde o canvas original na impressão */
+      #relatorioChart {
+        display: none !important;
+      }
+      /* Mostra a imagem gerada na impressão */
+      #grafico-para-impressao {
+        display: block !important;
+        width: 100%; /* Garante que a imagem ocupe a largura disponível */
+        height: auto;
+        page-break-inside: avoid; /* Tenta não quebrar a imagem entre páginas */
+      }
+      /* Força a impressão das cores e do fundo do gráfico */
+      * {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
       }
     }
   </style>
@@ -103,9 +119,11 @@
       </table>
 
       <!-- Container para o gráfico, posicionado abaixo da tabela -->
-      <div class="chart-container mt-4 mb-4 no-print">
+      <div class="chart-container mt-4 mb-4">
         <h4 class="text-center">Entradas por Dia no Período</h4>
         <canvas id="relatorioChart"></canvas>
+        <!-- Imagem estática que será exibida apenas na impressão -->
+        <img id="grafico-para-impressao" alt="Gráfico de Entradas por Período" style="display: none;">
       </div>
 
       <div class="text-center no-print mt-4">
@@ -125,13 +143,15 @@
   <!-- Script para gerar o gráfico dinamicamente -->
   <% if (entradas && entradas.length > 0) { %>
   <script>
+    // Variável global para armazenar a instância do gráfico
+    let myChart;
+
     document.addEventListener('DOMContentLoaded', function() {
-      // Pega os dados das entradas que o servidor enviou para o EJS
+      // Pega os dados brutos das entradas que o servidor enviou
       const entradas = <%- JSON.stringify(entradas) %>;
 
-      // Agrupa e conta as entradas por dia
+      // Agrupa e conta as entradas por dia no lado do cliente
       const contagemPorDia = entradas.reduce((acc, entrada) => {
-        // Formata a data para o padrão brasileiro (DD/MM/AAAA) para usar como chave
         const data = new Date(entrada.data_hora).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
         acc[data] = (acc[data] || 0) + 1;
         return acc;
@@ -147,7 +167,7 @@
       const dataOrdenada = labelsOrdenados.map(label => contagemPorDia[label]);
 
       const ctx = document.getElementById('relatorioChart').getContext('2d');
-      new Chart(ctx, {
+      myChart = new Chart(ctx, {
         type: 'bar', // Tipo de gráfico
         data: {
           labels: labelsOrdenados, // Eixo X (Datas)
@@ -159,8 +179,19 @@
             borderWidth: 1
           }]
         },
-        options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } }, responsive: true }
+        options: {
+          scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } },
+          responsive: true,
+          animation: false // Desativar animações melhora a consistência da impressão
+        }
       });
+
+      // Gera a imagem estática do gráfico assim que ele é renderizado e a atribui ao <img>.
+      // O CSS cuidará de mostrá-la apenas na impressão, evitando a corrida com o evento 'beforeprint'.
+      const chartImage = document.getElementById('grafico-para-impressao');
+      if (myChart && chartImage) {
+        chartImage.src = myChart.toBase64Image();
+      }
     });
   </script>
   <% } %>

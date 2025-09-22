@@ -10,12 +10,60 @@
 <body class="container mt-4">
 
     <style>
-        /* Ocultar botões e links ao imprimir */
-@media print {
-    .no-print {
+      /* Define um container estável para o gráfico, evitando distorções na tela */
+      .chart-container {
+        position: relative;
+        height: 40vh; /* Usa 40% da altura da tela, ajuste se necessário */
+        width: 100%;
+      }
+
+      /* Esconde a imagem gerada para impressão na visualização de tela */
+      #grafico-para-impressao {
         display: none;
-    }
-}
+      }
+
+      /* Estilos para impressão */
+      /* --- ESTILOS PARA IMPRESSÃO --- */
+      @media print {
+        .no-print {
+          display: none; /* Mantém a regra para ocultar botões, etc. */
+          display: none !important;
+        }
+
+        /* Garante que o gráfico não seja cortado e tenha um tamanho razoável */
+        .chart-container {
+          display: block !important;
+        }
+        /* Esconde o gráfico dinâmico (canvas) durante a impressão */
+        .chart-container canvas {
+          display: none !important; /* Esconde o canvas dinâmico na impressão */
+          position: static !important; /* Garante que o gráfico se comporte como um bloco normal na impressão */
+          page-break-inside: avoid; /* Tenta evitar que o gráfico seja quebrado entre duas páginas */
+          height: 400px !important; /* Define uma altura fixa para a impressão */
+          width: 100% !important; /* Define uma largura fixa para a impressão */
+          display: none !important;
+        }
+
+        /* Força a impressão das cores e do fundo do gráfico (ESSENCIAL) */
+        /* Mostra a imagem estática do gráfico e garante que ela não seja cortada */
+        #grafico-para-impressao {
+            display: block !important;
+            width: 100% !important;
+            page-break-inside: avoid; /* Tenta não quebrar a imagem entre páginas */
+        }
+
+        /* Força a impressão das cores (essencial para o gráfico) */
+        * {
+          -webkit-print-color-adjust: exact !important;
+          color-adjust: exact !important;
+        }
+
+        /* Estilo para a imagem do gráfico gerada para impressão */
+        #grafico-para-impressao {
+            display: block !important; /* Mostra a imagem estática na impressão */
+            width: 100% !important;
+        }
+      }
     </style>
     <style>
   #btnTopo {
@@ -82,14 +130,14 @@
   <% } %>
 
   <!-- Container para o gráfico -->
-  <div class="chart-container mt-4 mb-4 no-print">
+  <div class="chart-container mt-4 mb-4">
     <h4 class="text-center">Entradas por Dia no Mês</h4>
     <canvas id="entradasMesChart"></canvas>
   </div>
 
   <!-- Botão de imprimir -->
-    <div class="mt-3 no-print">
-        <button class="btn btn-info" onClick="window.print()"><i class="bi bi-printer"></i> Imprimir Lista</button>
+  <div class="mt-3 no-print">
+    <button class="btn btn-info" onclick="window.print()"><i class="bi bi-printer"></i> Imprimir Lista</button>
     <script>
     const filtroInput = document.getElementById('searchInput');
     const tabela = document.getElementById('tabela-entradas');
@@ -110,6 +158,9 @@
   <!-- Código JavaScript para gerar o gráfico -->
   <% if (entradas && entradas.length > 0) { %>
   <script>
+    // Variável para armazenar a instância do gráfico e ser acessível pela função de impressão
+    let meuGrafico;
+
     document.addEventListener('DOMContentLoaded', function() {
       // Pega os dados das entradas que o servidor enviou para o EJS
       const entradas = <%- JSON.stringify(entradas) %>;
@@ -131,7 +182,7 @@
       const dataOrdenada = labelsOrdenados.map(label => contagemPorDia[label]);
 
       const ctx = document.getElementById('entradasMesChart').getContext('2d');
-      new Chart(ctx, {
+      meuGrafico = new Chart(ctx, {
         type: 'bar',
         data: {
           labels: labelsOrdenados,
@@ -143,8 +194,21 @@
             borderWidth: 1
           }]
         },
-        options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } }, responsive: true }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false, // MUITO IMPORTANTE: permite que o gráfico preencha o container sem se deformar
+          animation: false, // Desativa animações para uma renderização de impressão mais estável
+          scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } }
+        }
       });
+
+      // Gera uma imagem estática do gráfico e a adiciona à página (escondida).
+      // O CSS irá controlar a visibilidade na hora de imprimir.
+      const imagemGraficoUrl = meuGrafico.toBase64Image();
+      const imgElement = document.createElement('img');
+      imgElement.src = imagemGraficoUrl;
+      imgElement.id = 'grafico-para-impressao';
+      document.querySelector('.chart-container').appendChild(imgElement);
     });
   </script>
   <% } %>

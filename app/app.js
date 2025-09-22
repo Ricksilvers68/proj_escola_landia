@@ -27,12 +27,12 @@ app.use((req, res, next) => {
 
   // Terminal do aluno → só pode acessar /buscar e /resultado
   if (ipTerminalAluno.includes(ipCliente)) {
-  const rotasPermitidas = ['/buscar', '/resultado'];
-  const rotaLiberada = rotasPermitidas.includes(req.path) || req.path.startsWith('/public');
-  if (rotaLiberada) return next();
+    const rotasPermitidas = ['/buscar', '/resultado'];
+    const rotaLiberada = rotasPermitidas.includes(req.path) || req.path.startsWith('/public');
+    if (rotaLiberada) return next();
 
-  return res.status(403).send('<h3 style="font-family: sans-serif;">Acesso restrito: Essa página não está liberada neste terminal.</h3>');
-}
+    return res.status(403).send('<h3 style="font-family: sans-serif;">Acesso restrito: Essa página não está liberada neste terminal.</h3>');
+  }
 
   // IP com acesso total
   if (ipsComAcessoTotal.includes(ipCliente)) {
@@ -77,66 +77,78 @@ const db = mysql.createPool({
 
 // --- ROTAS ---
 
-app.get('/', (req, res) => {
-  db.query('SELECT * FROM alunos ORDER BY nome ASC', (err, results) => {
-    if (err) throw err;
-    res.render('index', { alunos: results });
-  });
+app.get('/', async (req, res) => {
+  try {
+    const [alunos] = await db.promise().query('SELECT * FROM alunos ORDER BY nome ASC');
+    res.render('index', { alunos, erro: null });
+  } catch (error) {
+    console.error('Erro ao buscar alunos:', error);
+    res.status(500).render('index', { alunos: [], erro: 'Falha ao carregar a lista de alunos.' });
+  }
 });
 
-app.post('/add', (req, res) => {
-  const { nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2 } = req.body;
+app.post('/add', async (req, res) => {
+  try {
+    const { nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2 } = req.body;
 
-  const queryVerifica = 'SELECT * FROM alunos WHERE nome = ? AND ra = ?';
-  db.query(queryVerifica, [nome, ra], (err, resultados) => {
-    if (err) throw err;
-    if (resultados.length > 0) {
+    const [existentes] = await db.promise().query('SELECT id FROM alunos WHERE nome = ? AND ra = ?', [nome, ra]);
+
+    if (existentes.length > 0) {
+      const [alunos] = await db.promise().query('SELECT * FROM alunos ORDER BY nome ASC');
       return res.render('index', {
-        alunos: resultados,
+        alunos: alunos,
         erro: 'Aluno com este nome e RA já está cadastrado!'
       });
     }
 
-    const queryInsere = `
-      INSERT INTO alunos (nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2)
-      VALUES (?, ?, ?, ?, ?)
-    `;
-    db.query(queryInsere, [nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2], (err) => {
-      if (err) throw err;
-      res.redirect('/');
-    });
-  });
-});
-
-app.get('/edit/:id', (req, res) => {
-  const id = req.params.id;
-  db.query('SELECT * FROM alunos WHERE id = ?', [id], (err, result) => {
-    if (err) throw err;
-    res.render('edit', { aluno: result[0] });
-  });
-});
-
-app.post('/update/:id', (req, res) => {
-  const id = req.params.id;
-  const { nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2 } = req.body;
-
-  const queryAtualiza = `
-    UPDATE alunos
-    SET nome = ?, ra = ?, data_nascimento = ?, tel_responsavel_1 = ?, tel_responsavel_2 = ?
-    WHERE id = ?
-  `;
-  db.query(queryAtualiza, [nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2, id], (err) => {
-    if (err) throw err;
+    const queryInsere = 'INSERT INTO alunos (nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2) VALUES (?, ?, ?, ?, ?)';
+    await db.promise().query(queryInsere, [nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2]);
     res.redirect('/');
-  });
+  } catch (error) {
+    console.error('Erro ao adicionar aluno:', error);
+    res.status(500).send('Erro ao processar a sua solicitação.');
+  }
 });
 
-app.post('/delete/:id', (req, res) => {
-  const id = req.params.id;
-  db.query('DELETE FROM alunos WHERE id = ?', [id], (err) => {
-    if (err) throw err;
+app.get('/edit/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [results] = await db.promise().query('SELECT * FROM alunos WHERE id = ?', [id]);
+
+    if (results.length === 0) {
+      return res.status(404).send('Aluno não encontrado.');
+    }
+    res.render('edit', { aluno: results[0] });
+  } catch (error) {
+    console.error('Erro ao buscar aluno para edição:', error);
+    res.status(500).send('Erro ao carregar página de edição.');
+  }
+});
+
+app.post('/update/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2 } = req.body;
+    const query = 'UPDATE alunos SET nome = ?, ra = ?, data_nascimento = ?, tel_responsavel_1 = ?, tel_responsavel_2 = ? WHERE id = ?';
+    await db.promise().query(query, [nome, ra, data_nascimento, tel_responsavel_1, tel_responsavel_2, id]);
     res.redirect('/');
-  });
+  } catch (error) {
+    console.error('Erro ao atualizar aluno:', error);
+    res.status(500).send('Erro ao atualizar os dados do aluno.');
+  }
+});
+
+app.post('/delete/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Adicionar verificação de entradas associadas antes de deletar seria uma boa prática
+    await db.promise().query('DELETE FROM alunos WHERE id = ?', [id]);
+    res.redirect('/');
+  } catch (error) {
+    console.error('Erro ao deletar aluno:', error);
+    // Se houver uma chave estrangeira, o erro será capturado aqui
+    res.status(500).send('Erro ao deletar o aluno. Verifique se ele não possui registros de entrada associados.');
+  }
 });
 
 // 📆 Relatório por data
@@ -173,42 +185,49 @@ app.get('/buscar', (req, res) => {
 });
 
 app.post('/buscar', async (req, res) => {
-  const { nome, ra, justificativa } = req.body;
-  const nomeLimpo = nome.trim().replace(/\s+/g, ' ');
-  const raLimpo = parseInt(ra.trim());
+  try {
+    const { nome, ra, justificativa } = req.body;
+    const nomeLimpo = nome.trim().replace(/\s+/g, ' ');
+    const raLimpo = parseInt(ra.trim());
 
-  console.log('📥 Dados recebidos:', JSON.stringify({ nome: nomeLimpo, ra: raLimpo, justificativa }));
+    console.log('📥 Dados recebidos:', JSON.stringify({ nome: nomeLimpo, ra: raLimpo, justificativa }));
 
-  const [results] = await db.promise().query(
-    'SELECT * FROM alunos WHERE nome = ? AND ra = ?', [nomeLimpo, raLimpo]
-  );
-
-  if (results.length > 0) {
-    const aluno = results[0];
-    const horaAtual = new Date();
-    await db.promise().query(
-      'INSERT INTO entradas (aluno_id, data_hora, justificativa) VALUES (?, ?, ?)',
-      [aluno.id, horaAtual, justificativa || null]
+    const [results] = await db.promise().query(
+      'SELECT * FROM alunos WHERE nome = ? AND ra = ?', [nomeLimpo, raLimpo]
     );
 
-    console.log('✅ Entrada registrada no banco.');
+    if (results.length > 0) {
+      const aluno = results[0];
+      const horaAtual = new Date();
+      await db.promise().query(
+        'INSERT INTO entradas (aluno_id, data_hora, justificativa) VALUES (?, ?, ?)',
+        [aluno.id, horaAtual, justificativa || null]
+      );
 
+      console.log('✅ Entrada registrada no banco.');
+
+      req.session.resultadoBusca = {
+        aluno,
+        horaAtual: horaAtual.toLocaleTimeString(),
+        justificativa: justificativa?.trim() ? 'Sim' : 'Não',
+        erro: null
+      };
+    } else {
+      req.session.resultadoBusca = {
+        aluno: null,
+        horaAtual: null,
+        justificativa: null,
+        erro: 'Verifique se digitou corretamente seu Nome e RA.'
+      };
+    }
+  } catch (error) {
+    console.error('Erro ao buscar aluno e registrar entrada:', error);
     req.session.resultadoBusca = {
-      aluno,
-      horaAtual: horaAtual.toLocaleTimeString(),
-      justificativa: justificativa?.trim() ? 'Sim' : 'Não',
-      erro: null
+      erro: 'Ocorreu um erro interno. Por favor, tente novamente.'
     };
-  } else {
-    req.session.resultadoBusca = {
-      aluno: null,
-      horaAtual: null,
-      justificativa: null,
-      erro: 'Verifique se digitou corretamente seu Nome e RA.'
-    };
+  } finally {
+    res.redirect('/resultado');
   }
-
-  res.redirect('/resultado');
 });
 
 app.get('/resultado', (req, res) => {
@@ -225,49 +244,50 @@ app.get('/manual', (req, res) => {
 
 // 📆 Entradas do dia
 app.get('/entradas', async (req, res) => {
-  const hoje = new Date();
-  const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 0, 0, 0);
-  const fim = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 23, 59, 59);
-  const query = `
-    SELECT alunos.nome, alunos.ra, entradas.data_hora, entradas.justificativa, alunos.tel_responsavel_1, alunos.tel_responsavel_2
-    FROM entradas
-    JOIN alunos ON entradas.aluno_id = alunos.id
-    WHERE entradas.data_hora BETWEEN ? AND ?
-    ORDER BY alunos.nome ASC, entradas.data_hora ASC
-  `;
-  const [entradas] = await db.promise().query(query, [inicio, fim]);
-  console.log(entradas.map(e => e.nome));
-  res.render('entradas', { entradas });
+  try {
+    const hoje = new Date();
+    const inicio = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 0, 0, 0);
+    const fim = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 23, 59, 59);
+    const query = `
+      SELECT alunos.nome, alunos.ra, entradas.data_hora, entradas.justificativa, alunos.tel_responsavel_1, alunos.tel_responsavel_2
+      FROM entradas
+      JOIN alunos ON entradas.aluno_id = alunos.id
+      WHERE entradas.data_hora BETWEEN ? AND ?
+      ORDER BY alunos.nome ASC, entradas.data_hora ASC
+    `;
+    const [entradas] = await db.promise().query(query, [inicio, fim]);
+    res.render('entradas', { entradas });
+  } catch (error) {
+    console.error('Erro ao buscar as entradas do dia:', error);
+    res.status(500).send('Falha ao carregar as entradas do dia.');
+  }
 });
 
 // 📆 Entradas do mês
-app.get('/entradas-mes', (req, res) => {
-  const agora = new Date();
-  const ano = agora.getFullYear();
-  const mes = agora.getMonth() + 1;
-  const mesFormatado = mes < 10 ? `0${mes}` : `${mes}`;
-  const inicioDoMes = `${ano}-${mesFormatado}-01 00:00:00`;
+app.get('/entradas-mes', async (req, res) => {
+  try {
+    const agora = new Date();
+    const ano = agora.getFullYear();
+    const mes = agora.getMonth(); // Mês atual (0-11)
 
-  const proximoMes = mes + 1;
-  const proximoAno = proximoMes > 12 ? ano + 1 : ano;
-  const proximoMesFormatado = proximoMes > 12 ? '01' : (proximoMes < 10 ? `0${proximoMes}` : `${proximoMes}`);
-  const inicioDoProximoMes = `${proximoAno}-${proximoMesFormatado}-01 00:00:00`;
+    // Cria datas para o início do mês atual e do próximo mês
+    const inicioDoMes = new Date(ano, mes, 1);
+    const inicioDoProximoMes = new Date(ano, mes + 1, 1);
 
-  const sql = `
-    SELECT entradas.*, alunos.nome, alunos.ra, alunos.tel_responsavel_1, alunos.tel_responsavel_2
-    FROM entradas
-    INNER JOIN alunos ON entradas.aluno_id = alunos.id
-    WHERE entradas.data_hora >= ? AND entradas.data_hora < ?
-    ORDER BY alunos.nome ASC, entradas.data_hora ASC
-  `;
+    const sql = `
+      SELECT entradas.*, alunos.nome, alunos.ra, alunos.tel_responsavel_1, alunos.tel_responsavel_2
+      FROM entradas
+      INNER JOIN alunos ON entradas.aluno_id = alunos.id
+      WHERE entradas.data_hora >= ? AND entradas.data_hora < ?
+      ORDER BY alunos.nome ASC, entradas.data_hora ASC
+    `;
 
-  db.query(sql, [inicioDoMes, inicioDoProximoMes], (err, resultados) => {
-    if (err) {
-      console.error('Erro ao buscar entradas do mês:', err);
-      return res.status(500).send('Erro no servidor');
-    }
+    const [resultados] = await db.promise().query(sql, [inicioDoMes, inicioDoProximoMes]);
     res.render('entradas_mes', { entradas: resultados });
-  });
+  } catch (error) {
+    console.error('Erro ao buscar entradas do mês:', error);
+    res.status(500).send('Ocorreu um erro ao gerar o relatório de entradas do mês.');
+  }
 });
 
 // 🔐 Login
@@ -276,15 +296,24 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  const { usuario, senha } = req.body;
-  const [rows] = await db.promise().query(
-    'SELECT * FROM usuarios WHERE usuario = ? AND senha = ?', [usuario, senha]
-  );
-  if (rows.length > 0) {
-    req.session.usuarioLogado = rows[0].usuario;
-    return res.redirect('/');
-  } else {
-    return res.render('login', { erro: 'Usuário ou senha inválidos.' });
+  try {
+    const { usuario, senha } = req.body;
+    // 🚨 ALERTA DE SEGURANÇA CRÍTICO: As senhas estão sendo comparadas em texto plano.
+    // Isso é uma vulnerabilidade grave. O correto é usar uma biblioteca como `bcrypt`
+    // para gerar um "hash" da senha no momento do cadastro e comparar o hash no login.
+    // Exemplo de comparação: const match = await bcrypt.compare(senha, usuarioDoBanco.senha_hash);
+    const [rows] = await db.promise().query(
+      'SELECT * FROM usuarios WHERE usuario = ? AND senha = ?', [usuario, senha]
+    );
+    if (rows.length > 0) {
+      req.session.usuarioLogado = rows[0].usuario;
+      return res.redirect('/');
+    } else {
+      return res.render('login', { erro: 'Usuário ou senha inválidos.' });
+    }
+  } catch (error) {
+    console.error('Erro durante o login:', error);
+    res.status(500).render('login', { erro: 'Ocorreu um erro no servidor. Tente novamente.' });
   }
 });
 
