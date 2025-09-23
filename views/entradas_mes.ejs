@@ -137,7 +137,7 @@
 
   <!-- Botão de imprimir -->
   <div class="mt-3 no-print">
-    <button class="btn btn-info" onclick="window.print()"><i class="bi bi-printer"></i> Imprimir Lista</button>
+    <button class="btn btn-info" style="margin-top: 15px;" onclick="window.print()"><i class="bi bi-printer"></i> Imprimir Lista</button>
     <script>
     const filtroInput = document.getElementById('searchInput');
     const tabela = document.getElementById('tabela-entradas');
@@ -189,8 +189,8 @@
           datasets: [{
             label: 'Total de Entradas por Dia',
             data: dataOrdenada,
-            backgroundColor: 'rgba(75, 192, 192, 0.6)',
-            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(54, 162, 235, 0.6)', // Cor de preenchimento das barras (azul)
+            borderColor: 'rgba(54, 162, 235, 1)',     // Cor da borda das barras (azul)
             borderWidth: 1
           }]
         },
