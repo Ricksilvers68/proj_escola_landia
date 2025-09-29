@@ -17,7 +17,6 @@
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "mysql2": "^3.14.1",
-    "puppeteer": "^24.19.0",
     "qrcode-terminal": "^0.12.0"
   }
 }

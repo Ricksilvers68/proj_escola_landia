@@ -30,10 +30,8 @@ tokens/
 # Arquivo de inicialização do pm2
 iniciar-servidor.bat
 
-# whatssap web js
-whatsapp-session/
-.wwebjs_auth/
-.wwebjs_cache/
+# Backup db
+dumps
 
 
 
