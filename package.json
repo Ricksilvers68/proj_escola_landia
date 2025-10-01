@@ -7,7 +7,7 @@
     "start": "node app/app.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Ricardo Silveira",
   "license": "ISC",
   "description": "",
   "dependencies": {
