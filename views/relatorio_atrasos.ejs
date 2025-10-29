@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório de Atrasos</title>
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+</head>
+<body class="bg-light">
+  <div class="container mt-5">
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white">
+        <h3 class="mb-0 text-center">Relatório de Atrasos dos Alunos</h3>
+      </div>
+      <div class="card-body">
+        
+        <!-- Formulário -->
+        <form action="/relatorio_atrasos" method="POST" class="row g-3 mb-4">
+          <div class="col-md-4">
+            <label for="mes" class="form-label">Mês:</label>
+            <input type="number" id="mes" name="mes" class="form-control" min="1" max="12" required placeholder="Ex: 10">
+          </div>
+          <div class="col-md-4">
+            <label for="ano" class="form-label">Ano:</label>
+            <input type="number" id="ano" name="ano" class="form-control" min="2020" max="2100" required placeholder="Ex: 2025">
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-success w-100">Gerar Relatório</button>
+          </div>
+        </form>
+
+        <!-- Resultados -->
+        <% if (resultados && resultados.length > 0) { %>
+          <h5 class="mt-4 mb-3 text-center text-secondary">
+            Resultados — <%= mes %>/<%= ano %>
+          </h5>
+
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered align-middle text-center">
+              <thead class="table-primary">
+                <tr>
+                  <th>Aluno</th>
+                  <th>Total de Atraso</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% resultados.forEach(r => { %>
+                  <tr>
+                    <td><%= r.nome %></td>
+                    <td><%= r.total_minutos_atraso %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } else if (resultados && resultados.length === 0) { %>
+          <div class="alert alert-warning text-center mt-4">
+            Nenhum atraso encontrado para esse período.
+          </div>
+        <% } %>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

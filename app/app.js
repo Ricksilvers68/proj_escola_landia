@@ -237,6 +237,56 @@ app.get('/resultado', (req, res) => {
   res.render('resultado', resultado);
 });
 
+// =====================================
+// RELATÓRIO DE ATRASOS POR ALUNO (final, com formato bonito)
+// =====================================
+app.get('/relatorio_atrasos', (req, res) => {
+  res.render('relatorio_atrasos', { resultados: null });
+});
+
+app.post('/relatorio_atrasos', async (req, res) => {
+  const { mes, ano } = req.body;
+
+  const sql = `
+    SELECT 
+      a.nome,
+      SUM(
+        CASE 
+          WHEN TIME(e.data_hora) > '07:00:00' 
+          THEN TIMESTAMPDIFF(MINUTE, '07:00:00', TIME(e.data_hora))
+          ELSE 0
+        END
+      ) AS total_minutos_atraso
+    FROM entradas e
+    JOIN alunos a ON e.aluno_id = a.id
+    WHERE MONTH(e.data_hora) = ? AND YEAR(e.data_hora) = ?
+    GROUP BY a.nome
+    ORDER BY total_minutos_atraso DESC;
+  `;
+
+  try {
+    const [resultados] = await db.promise().query(sql, [mes, ano]);
+
+    const resultadosFormatados = resultados.map(r => {
+      const totalMinutos = r.total_minutos_atraso || 0;
+      const horas = Math.floor(totalMinutos / 60);
+      const minutos = totalMinutos % 60;
+      return {
+        nome: r.nome,
+        total_minutos_atraso: `${horas}h ${minutos}min`
+      };
+    });
+
+    res.render('relatorio_atrasos', { resultados: resultadosFormatados, mes, ano });
+  } catch (error) {
+    console.error('Erro ao gerar relatório de atrasos:', error.message);
+    res.status(500).send('Erro ao gerar relatório de atrasos.');
+  }
+});
+
+
+
+
 // 📘 Manual do sistema
 app.get('/manual', (req, res) => {
   res.render('manual');
