@@ -240,16 +240,12 @@ app.get('/resultado', (req, res) => {
 // =====================================
 // RELATÓRIO DE ATRASOS POR ALUNO (final, com formato bonito)
 // =====================================
-app.get('/relatorio_atrasos',async(req, res) => {
-  res.render('relatorio_atrasos', { resultados: null });
+// Rota GET — apenas exibe a página vazia, sem mensagem nem resultados
+app.get('/relatorio_atrasos', (req, res) => {
+  res.render('relatorio_atrasos', { resultados: null, mes: null, ano: null, mensagem: null });
 });
 
-// =====================================
-// RELATÓRIO DE ATRASOS POR ALUNO (robusto e compatível)
-// =====================================
-// =====================================
-// RELATÓRIO DE ATRASOS POR ALUNO (corrigido)
-// =====================================
+// Rota POST — gera o relatório
 app.post('/relatorio_atrasos', async (req, res) => {
   const { mes, ano } = req.body;
 
@@ -258,20 +254,19 @@ app.post('/relatorio_atrasos', async (req, res) => {
       a.nome,
       SUM(
         CASE 
-          -- Turno da manhã (entre 07:00 e 08:00)
+          -- Turno da manhã (07:00 a 08:00)
           WHEN TIME(e.data_hora) BETWEEN '07:00:01' AND '08:00:00' THEN 
             TIMESTAMPDIFF(MINUTE,
               CAST(CONCAT(DATE(e.data_hora), ' 07:00:00') AS DATETIME),
               e.data_hora
             )
           
-          -- Turno da tarde (entre 14:20 e 15:20)
+          -- Turno da tarde (14:20 a 15:20)
           WHEN TIME(e.data_hora) BETWEEN '14:20:01' AND '15:20:00' THEN 
             TIMESTAMPDIFF(MINUTE,
               CAST(CONCAT(DATE(e.data_hora), ' 14:20:00') AS DATETIME),
               e.data_hora
             )
-
           ELSE 0
         END
       ) AS total_minutos_atraso
@@ -279,13 +274,17 @@ app.post('/relatorio_atrasos', async (req, res) => {
     JOIN alunos a ON e.aluno_id = a.id
     WHERE MONTH(e.data_hora) = ? AND YEAR(e.data_hora) = ?
     GROUP BY a.nome
+    HAVING total_minutos_atraso > 0
     ORDER BY total_minutos_atraso DESC;
   `;
 
   try {
     const [resultados] = await db.promise().query(sql, [mes, ano]);
 
-    // 🔄 Formata o total de minutos em "Xh Ym"
+    if (resultados.length === 0) {
+      return res.render('relatorio_atrasos', { resultados: [], mes, ano, mensagem: 'Nenhum atraso encontrado para este período.' });
+    }
+
     const resultadosFormatados = resultados.map(r => {
       const totalMinutos = r.total_minutos_atraso || 0;
       const horas = Math.floor(totalMinutos / 60);
@@ -296,13 +295,14 @@ app.post('/relatorio_atrasos', async (req, res) => {
       };
     });
 
-    res.render('relatorio_atrasos', { resultados: resultadosFormatados, mes, ano });
+    res.render('relatorio_atrasos', { resultados: resultadosFormatados, mes, ano, mensagem: null });
   } catch (error) {
-    console.error('Erro ao gerar relatório de atrasos:', error.sqlMessage || error.message);
-    console.error('SQL executado:', error.sql || '(sem SQL registrado)');
+    console.error('Erro ao gerar relatório de atrasos:', error);
     res.status(500).send('Erro ao gerar relatório de atrasos.');
   }
 });
+
+
 
 
 

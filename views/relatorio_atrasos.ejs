@@ -81,6 +81,12 @@
           </div>
         </form>
 
+        <% if (mensagem && mes && ano) { %>
+  <p style="text-align:center; color: #777; font-style: italic;">
+    <%= mensagem %>
+  </p>
+<% } %>
+
         <!-- Resultados -->
         <% if (resultados && resultados.length > 0) { %>
           <h5 class="mt-4 mb-3 text-center text-secondary">
