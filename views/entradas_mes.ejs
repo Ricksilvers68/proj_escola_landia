@@ -118,8 +118,8 @@
           <tr>
             <td><%= entrada.nome ? String(entrada.nome).toUpperCase() : '-' %></td>
             <td><%= entrada.ra %></td>
-            <td><%= new Date(entrada.data_hora).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) %></td>
-            <td><%= new Date(entrada.data_hora).toLocaleTimeString('pt-BR', { timeZone: 'UTC' }) %></td>
+            <td><%= new Date(entrada.data_hora_local).toLocaleDateString('pt-BR') %></td>
+            <td><%= new Date(entrada.data_hora_local).toLocaleTimeString('pt-BR') %></td>
             <td><%= entrada.justificativa || '-' %></td>
             <td><%= entrada.tel_responsavel_1 || '' %></td>
             <td><%= entrada.tel_responsavel_2 || '' %></td>

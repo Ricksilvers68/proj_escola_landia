@@ -347,7 +347,15 @@ app.get('/entradas-mes', async (req, res) => {
     const inicioDoProximoMes = new Date(ano, mes + 1, 1);
 
     const sql = `
-      SELECT entradas.*, alunos.nome, alunos.ra, alunos.tel_responsavel_1, alunos.tel_responsavel_2
+      SELECT 
+        entradas.id,
+        entradas.aluno_id,
+        DATE_FORMAT(entradas.data_hora, '%Y-%m-%d %H:%i:%s') AS data_hora_local,
+        alunos.nome,
+        alunos.ra,
+        alunos.tel_responsavel_1,
+        alunos.tel_responsavel_2,
+        entradas.justificativa
       FROM entradas
       INNER JOIN alunos ON entradas.aluno_id = alunos.id
       WHERE entradas.data_hora >= ? AND entradas.data_hora < ?
