@@ -160,59 +160,53 @@
   <!-- Código JavaScript para gerar o gráfico -->
   <% if (entradas && entradas.length > 0) { %>
   <script>
-    // Variável para armazenar a instância do gráfico e ser acessível pela função de impressão
-    let meuGrafico;
+  let meuGrafico;
 
-    document.addEventListener('DOMContentLoaded', function() {
-      // Pega os dados das entradas que o servidor enviou para o EJS
-      const entradas = <%- JSON.stringify(entradas) %>;
+  document.addEventListener('DOMContentLoaded', function() {
+    const entradas = <%- JSON.stringify(entradas || []) %>;
 
-      // Agrupa e conta as entradas por dia
-      const contagemPorDia = entradas.reduce((acc, entrada) => {
-        const data = new Date(entrada.data_hora).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
-        acc[data] = (acc[data] || 0) + 1;
-        return acc;
-      }, {});
+    const contagemPorDia = entradas.reduce((acc, entrada) => {
+      const data = new Date(entrada.data_hora_local).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+      acc[data] = (acc[data] || 0) + 1;
+      return acc;
+    }, {});
 
-      // Ordena as datas para que o gráfico fique em ordem cronológica
-      const labelsOrdenados = Object.keys(contagemPorDia).sort((a, b) => {
-          const [diaA, mesA, anoA] = a.split('/');
-          const [diaB, mesB, anoB] = b.split('/');
-          return new Date(`${anoA}-${mesA}-${diaA}`) - new Date(`${anoB}-${mesB}-${diaB}`);
-      });
-
-      const dataOrdenada = labelsOrdenados.map(label => contagemPorDia[label]);
-
-      const ctx = document.getElementById('entradasMesChart').getContext('2d');
-      meuGrafico = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labelsOrdenados,
-          datasets: [{
-            label: 'Total de Entradas por Dia',
-            data: dataOrdenada,
-            backgroundColor: 'rgba(54, 162, 235, 0.6)', // Cor de preenchimento das barras (azul)
-            borderColor: 'rgba(54, 162, 235, 1)',     // Cor da borda das barras (azul)
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false, // MUITO IMPORTANTE: permite que o gráfico preencha o container sem se deformar
-          animation: false, // Desativa animações para uma renderização de impressão mais estável
-          scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } }
-        }
-      });
-
-      // Gera uma imagem estática do gráfico e a adiciona à página (escondida).
-      // O CSS irá controlar a visibilidade na hora de imprimir.
-      const imagemGraficoUrl = meuGrafico.toBase64Image();
-      const imgElement = document.createElement('img');
-      imgElement.src = imagemGraficoUrl;
-      imgElement.id = 'grafico-para-impressao';
-      document.querySelector('.chart-container').appendChild(imgElement);
+    const labelsOrdenados = Object.keys(contagemPorDia).sort((a, b) => {
+      const [diaA, mesA, anoA] = a.split('/');
+      const [diaB, mesB, anoB] = b.split('/');
+      return new Date(`${anoA}-${mesA}-${diaA}`) - new Date(`${anoB}-${mesB}-${diaB}`);
     });
-  </script>
+
+    const dataOrdenada = labelsOrdenados.map(label => contagemPorDia[label]);
+
+    const ctx = document.getElementById('entradasMesChart').getContext('2d');
+    meuGrafico = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labelsOrdenados,
+        datasets: [{
+          label: 'Total de Entradas por Dia',
+          data: dataOrdenada,
+          backgroundColor: 'rgba(54, 162, 235, 0.6)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } }
+      }
+    });
+
+    const imagemGraficoUrl = meuGrafico.toBase64Image();
+    const imgElement = document.createElement('img');
+    imgElement.src = imagemGraficoUrl;
+    imgElement.id = 'grafico-para-impressao';
+    document.querySelector('.chart-container').appendChild(imgElement);
+  });
+</script>
   <% } %>
 
   <!-- Script para filtro na tabela -->
