@@ -102,13 +102,17 @@
                 </tr>
               </thead>
               <tbody>
-                <% resultados.forEach(r => { %>
-                  <tr>
-                    <td><%= r.nome %></td>
-                    <td><%= r.total_minutos_atraso %></td>
-                  </tr>
-                <% }) %>
-              </tbody>
+  <% resultados.forEach(r => { %>
+    <tr>
+      <td><%= r.nome %></td>
+      <% 
+        const horas = Math.floor(r.total_minutos_atraso / 60);
+        const minutos = r.total_minutos_atraso % 60;
+      %>
+      <td><%= horas > 0 ? `${horas}h ${minutos}min` : `${minutos}min` %></td>
+    </tr>
+  <% }) %>
+</tbody>
             </table>
 
             <!-- Botões -->

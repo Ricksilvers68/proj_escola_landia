@@ -243,27 +243,27 @@ app.get('/resultado', (req, res) => {
 // Página inicial do relatório
 app.get('/relatorio_atrasos', async (req, res) => {
   try {
-    const agora = new Date()
-    const ano = req.query.ano || agora.getFullYear()
-    const mes = req.query.mes || agora.getMonth() + 1
+    const { mes, ano } = req.query;
+    const mesSelecionado = mes || (new Date().getMonth() + 1);
+    const anoSelecionado = ano || new Date().getFullYear();
 
     const sql = `
       SELECT 
         a.nome,
         SUM(
           CASE 
-            -- Turno da manhã: atraso após 07:00 até 08:00
-            WHEN TIME(e.data_hora) BETWEEN '07:00:01' AND '08:00:00' THEN 
+            -- Manhã: atraso entre 07:00 e 08:00
+            WHEN TIME(CONVERT_TZ(e.data_hora, '+00:00', '-03:00')) BETWEEN '07:00:01' AND '08:00:00' THEN 
               TIMESTAMPDIFF(MINUTE,
-                CAST(CONCAT(DATE(e.data_hora), ' 07:00:00') AS DATETIME),
-                e.data_hora
+                CAST(CONCAT(DATE(CONVERT_TZ(e.data_hora, '+00:00', '-03:00')), ' 07:00:00') AS DATETIME),
+                CONVERT_TZ(e.data_hora, '+00:00', '-03:00')
               )
 
-            -- Turno da tarde: atraso após 14:20 até 15:20
-            WHEN TIME(e.data_hora) BETWEEN '14:20:01' AND '15:20:00' THEN 
+            -- Tarde: atraso entre 14:20 e 15:20
+            WHEN TIME(CONVERT_TZ(e.data_hora, '+00:00', '-03:00')) BETWEEN '14:20:01' AND '15:20:00' THEN 
               TIMESTAMPDIFF(MINUTE,
-                CAST(CONCAT(DATE(e.data_hora), ' 14:20:00') AS DATETIME),
-                e.data_hora
+                CAST(CONCAT(DATE(CONVERT_TZ(e.data_hora, '+00:00', '-03:00')), ' 14:20:00') AS DATETIME),
+                CONVERT_TZ(e.data_hora, '+00:00', '-03:00')
               )
 
             ELSE 0
@@ -271,27 +271,19 @@ app.get('/relatorio_atrasos', async (req, res) => {
         ) AS total_minutos_atraso
       FROM entradas e
       JOIN alunos a ON e.aluno_id = a.id
-      WHERE MONTH(e.data_hora) = ?
-        AND YEAR(e.data_hora) = ?
+      WHERE MONTH(CONVERT_TZ(e.data_hora, '+00:00', '-03:00')) = ? 
+        AND YEAR(CONVERT_TZ(e.data_hora, '+00:00', '-03:00')) = ?
       GROUP BY a.nome
       HAVING total_minutos_atraso > 0
       ORDER BY total_minutos_atraso DESC;
-    `
+    `;
 
-    const [resultados] = await db.promise().query(sql, [mes, ano])
-
-    // Converter minutos acumulados para formato "H:mm"
-    resultados.forEach(r => {
-      const horas = Math.floor(r.total_minutos_atraso / 60)
-      const minutos = r.total_minutos_atraso % 60
-      r.total_formatado = `${horas}h ${minutos.toString().padStart(2, '0')}min`
-    })
-
-    res.render('relatorio_atrasos', { resultados, mes, ano, mensagem:null })
+    const [resultados] = await db.promise().query(sql, [mesSelecionado, anoSelecionado]);
+    res.render('relatorio_atrasos', { resultados, mes: mesSelecionado, ano: anoSelecionado, mensagem: null });
   } catch (error) {
-    console.error('Erro ao gerar relatório de atrasos:', error)
-    res.status(500).send('Ocorreu um erro ao gerar o relatório de atrasos.')
-  }
+    console.error('Erro ao gerar relatório de atrasos:', error);
+    res.status(500).send('Erro ao gerar relatório de atrasos');
+  }
 });
 
 
