@@ -217,7 +217,7 @@ app.post('/buscar', async (req, res) => {
           aluno,
           horaAtual: null,
           justificativa: null,
-          erro: `⚠️ O aluno ${aluno.nome} já registrou a entrada hoje.`
+          erro: `⚠️ O(a) estudante ${aluno.nome} já registrou a entrada hoje.`
         };
       } else {
         // 3️⃣ Registrar nova entrada (corrigindo fuso horário manualmente para UTC-3)
