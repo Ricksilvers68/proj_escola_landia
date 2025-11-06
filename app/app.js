@@ -192,38 +192,66 @@ app.post('/buscar', async (req, res) => {
 
     console.log('📥 Dados recebidos:', JSON.stringify({ nome: nomeLimpo, ra: raLimpo, justificativa }));
 
+    // 1️⃣ Buscar o aluno pelo nome e RA
     const [results] = await db.promise().query(
-      'SELECT * FROM alunos WHERE nome = ? AND ra = ?', [nomeLimpo, raLimpo]
+      'SELECT * FROM alunos WHERE nome = ? AND ra = ?', 
+      [nomeLimpo, raLimpo]
     );
 
     if (results.length > 0) {
       const aluno = results[0];
-      const horaAtual = new Date();
-      await db.promise().query(
-        'INSERT INTO entradas (aluno_id, data_hora, justificativa) VALUES (?, ?, ?)',
-        [aluno.id, horaAtual, justificativa || null]
-      );
 
-      console.log('✅ Entrada registrada no banco.');
+      // 2️⃣ Verificar se já existe registro de entrada hoje (considerando fuso horário -03:00)
+      const sqlVerifica = `
+        SELECT id 
+        FROM entradas 
+        WHERE aluno_id = ? 
+          AND DATE(CONVERT_TZ(data_hora, '+00:00', '-03:00')) = CURDATE()
+        LIMIT 1
+      `;
+      const [existeEntradaHoje] = await db.promise().query(sqlVerifica, [aluno.id]);
 
-      req.session.resultadoBusca = {
-        aluno,
-        horaAtual: horaAtual.toLocaleTimeString(),
-        justificativa: justificativa?.trim() ? 'Sim' : 'Não',
-        erro: null
-      };
+      if (existeEntradaHoje.length > 0) {
+        console.log(`⚠️ O aluno ${aluno.nome} já registrou entrada hoje.`);
+        req.session.resultadoBusca = {
+          aluno,
+          horaAtual: null,
+          justificativa: null,
+          erro: `⚠️ O aluno ${aluno.nome} já registrou a entrada hoje.`
+        };
+      } else {
+        // 3️⃣ Registrar nova entrada (corrigindo fuso horário manualmente para UTC-3)
+const agora = new Date();
+const horaCorrigida = new Date(agora.getTime()); 
+
+const sqlInsert = `
+  INSERT INTO entradas (aluno_id, data_hora, justificativa)
+  VALUES (?, ?, ?)
+`;
+await db.promise().query(sqlInsert, [aluno.id, horaCorrigida, justificativa || null]);
+
+console.log('✅ Entrada registrada no banco.');
+
+req.session.resultadoBusca = {
+  aluno,
+  horaAtual: agora.toLocaleTimeString('pt-BR', { hour12: false }),
+  justificativa: justificativa?.trim() ? 'Sim' : 'Não',
+  erro: null
+};
+      }
+
     } else {
       req.session.resultadoBusca = {
         aluno: null,
         horaAtual: null,
         justificativa: null,
-        erro: 'Verifique se digitou corretamente seu Nome e RA.'
+        erro: '❌ Verifique se digitou corretamente seu Nome e RA.'
       };
     }
   } catch (error) {
     console.error('Erro ao buscar aluno e registrar entrada:', error);
     req.session.resultadoBusca = {
-      erro: 'Ocorreu um erro interno. Por favor, tente novamente.'
+      erro: '⚠️ Ocorreu um erro interno. Por favor, tente novamente.'
     };
   } finally {
     res.redirect('/resultado');

@@ -43,20 +43,28 @@
     <div class="card shadow-sm mx-auto" style="max-width: 500px;">
       <div class="card-body">
         <% if (erro) { %>
-          <div class="alert alert-danger"><%= erro %></div>
+          <% if (erro.includes('já registrou a entrada hoje')) { %>
+            <div class="alert alert-warning fw-bold" role="alert">
+              <%= erro %>
+            </div>
+          <% } else { %>
+            <div class="alert alert-danger fw-bold" role="alert">
+              ❌ <%= erro %>
+            </div>
+          <% } %>
+
           <a href="/buscar" class="btn btn-secondary mt-3">Tentar Novamente</a>
+
         <% } else if (aluno) { %>
-          <h4 class="mb-3 text-success">Registro efetuado com sucesso!</h4>
+          <h4 class="mb-3 text-success">✅ Registro efetuado com sucesso!</h4>
           <p><strong>Nome:</strong> <%= aluno.nome %></p>
           <p><strong>RA:</strong> <%= aluno.ra %></p>
           <p><strong>Horário:</strong> <%= horaAtual %></p>
           <p><strong>Justificativa:</strong> <%= justificativa || 'Nenhuma' %></p>  
-
-          
-
           <a href="/buscar" class="btn btn-primary mt-4">Voltar</a>
+
         <% } else { %>
-          <div class="alert alert-warning">Nenhuma informação para exibir.</div>
+          <div class="alert alert-warning fw-bold">⚠️ Nenhuma informação para exibir.</div>
           <a href="/buscar" class="btn btn-secondary mt-3">Voltar</a>
         <% } %>
       </div>
