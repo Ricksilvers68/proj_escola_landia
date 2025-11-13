@@ -217,7 +217,7 @@ app.post('/buscar', async (req, res) => {
           aluno,
           horaAtual: null,
           justificativa: null,
-          erro: `⚠️ O(a) estudante ${aluno.nome} já registrou a entrada hoje.`
+          erro: ` O(a) estudante ${aluno.nome} já registrou a entrada hoje.`
         };
       } else {
         // 3️⃣ Registrar nova entrada (corrigindo fuso horário manualmente para UTC-3)
@@ -230,7 +230,7 @@ const sqlInsert = `
 `;
 await db.promise().query(sqlInsert, [aluno.id, horaCorrigida, justificativa || null]);
 
-console.log('✅ Entrada registrada no banco.');
+console.log(' Entrada registrada no banco.');
 
 req.session.resultadoBusca = {
   aluno,
