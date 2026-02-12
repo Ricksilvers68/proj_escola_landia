@@ -42,6 +42,46 @@
       opacity: 0.4;
     }
 
+    .btn-indigo {
+  background-color: #6f42c1;
+  border-color: #6f42c1;
+  color: #fff;
+}
+
+.btn-indigo:hover {
+  background-color: #59339d;
+  border-color: #59339d;
+  color: #fff;
+}
+
+.btn-indigo:focus,
+.btn-indigo:active {
+  background-color: #4e2c8a;
+  border-color: #4e2c8a;
+  box-shadow: 0 0 0 .25rem rgba(111, 66, 193, .4);
+}
+
+.btn-pink {
+  background: #d63384;
+  border-color: #d63384;
+  color: #fff;
+}
+.btn-pink:hover {
+  background: #b82a6f;
+  border-color: #b82a6f;
+   color: #fff;
+}
+
+.btn-orange {
+  background: #e7914b;
+  border-color: #fd7e14;
+  color: #fff;
+}
+.btn-orange:hover {
+  background: #fd7e14;
+  border-color: #fd7e14;
+   color: #fff;
+}
     @media (max-width: 576px) {
       .menu-content {
         flex-direction: column;
@@ -101,16 +141,16 @@
 
           <!-- Botões de navegação -->
           <div class="d-flex flex-wrap gap-2 mt-2">
-            <a href="/buscar" class="btn btn-info btn-sm">
+            <a href="/buscar" class="btn btn-indigo btn-sm">
               <i class="bi bi-person-walking"></i> Registrar Entrada Alunos
             </a>
             <a href="/entradas" class="btn btn-primary btn-sm">
               <i class="bi bi-list-ul"></i> Entradas do Dia
             </a>
-            <a href="/entradas-mes" class="btn btn-outline-info btn-sm">
+            <a href="/entradas-mes" class="btn btn-pink btn-sm">
               <i class="bi bi-calendar-month"></i> Entradas do Mês
             </a>
-            <a href="/relatorio_data" class="btn btn-outline-warning btn-sm">
+            <a href="/relatorio_data" class="btn btn-orange btn-sm">
               <i class="bi bi-calendar-month"></i> Relatório por Data
             </a>
             <a href="/relatorio_atrasos" class="btn btn-info btn-sm">
