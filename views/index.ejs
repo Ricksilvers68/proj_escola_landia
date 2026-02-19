@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-bs-theme="light">
 
 <head>
   <meta charset="UTF-8">
@@ -42,6 +42,25 @@
       opacity: 0.4;
     }
 
+    /* Melhorias visuais modo escuro */
+
+[data-bs-theme="dark"] .card {
+  border-color: #2a2a2a;
+}
+
+[data-bs-theme="dark"] .table thead {
+  background-color: #1e1e1e;
+}
+
+[data-bs-theme="dark"] .modal-content {
+  background-color: #1c1c1c;
+}
+
+[data-bs-theme="dark"] .navbar {
+  background-color: #141414 !important;
+}
+
+/*botões*/
     .btn-indigo {
   background-color: #6f42c1;
   border-color: #6f42c1;
@@ -73,13 +92,12 @@
 }
 
 .btn-orange {
-  background: #e7914b;
+  background: #fd7e14;
   border-color: #fd7e14;
   color: #fff;
 }
 .btn-orange:hover {
-  background: #fd7e14;
-  border-color: #fd7e14;
+  background: #ca6410;
    color: #fff;
 }
     @media (max-width: 576px) {
@@ -133,11 +151,14 @@
                 placeholder="ex.5511987654321" maxlength="15">
             </div>
             <div class="col-md-1">
-              <button type="submit" class="btn btn-success btn-sm w-100">
+              <button type="submit" class="btn btn-indigo btn-sm w-100">
                 <i class="bi bi-person-plus"></i> Adicionar
               </button>
             </div>
           </form>
+          <div class="form-check form-switch">
+  <input class="form-check-input" type="checkbox" id="themeToggle">
+</div>
 
           <!-- Botões de navegação -->
           <div class="d-flex flex-wrap gap-2 mt-2">
@@ -243,6 +264,8 @@
       location.reload();
     }
   </script>
+
+  <script src="/theme.js"></script>
 </body>
 
 </html>
