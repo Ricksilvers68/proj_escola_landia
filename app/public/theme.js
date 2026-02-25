@@ -1,16 +1,19 @@
-const toggle = document.getElementById('themeToggle');
-const html = document.documentElement;
+document.addEventListener('DOMContentLoaded', () => {
+  const html = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
 
-// Carrega tema salvo
-const savedTheme = localStorage.getItem('theme') || 'light';
-html.setAttribute('data-bs-theme', savedTheme);
-toggle.innerText = savedTheme === 'dark' ? 'MODO' : 'MODO';
+  // Lê preferência salva
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  html.setAttribute('data-bs-theme', savedTheme);
 
-toggle.addEventListener('click', () => {
-  const current = html.getAttribute('data-bs-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
+  // Atualiza estado do botão, se existir na página
+  if (toggle) {
+    toggle.checked = savedTheme === 'dark';
 
-  html.setAttribute('data-bs-theme', next);
-  localStorage.setItem('theme', next);
-  toggle.innerText = next === 'dark' ? 'MODO' : 'MODO';
+    toggle.addEventListener('change', () => {
+      const next = toggle.checked ? 'dark' : 'light';
+      html.setAttribute('data-bs-theme', next);
+      localStorage.setItem('theme', next);
+    });
+  }
 });
