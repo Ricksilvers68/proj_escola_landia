@@ -14,7 +14,10 @@ Possibilita:
 - ✅ CRUD de alunos (nome, RA, data de nascimento, números de telefones dos responsáveis dos alunos)  
 - ✅ Sistema de autenticação simples para acessar a área principal (index)  
 - ✅ Busca de alunos por nome e RA  
-- ✅ Registro de entrada de alunos e exibição de horários registrados  
+- ✅ Registro de entrada de alunos e exibição de horários registrados
+- contador (acumulador de atrasos dia a dia)
+- Impressão de relatórios diário, mensal e intervalar;
+- gráficos estatísticos
 - ✅ Estilização com *Bootstrap 4.5* e ícones do *Bootstrap Icons*
 
 ---
