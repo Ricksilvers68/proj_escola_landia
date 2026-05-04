@@ -6,19 +6,19 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require('path');
 
-// 🟢 Configurações iniciais
+//  Configurações iniciais
 const port = 3000;
 
-// 🔐 Lista de IPs com acesso completo
+// Lista de IPs com acesso completo
 const ipsComAcessoTotal = process.env.FULL_ACCESS_IPS.split(',').map(ip => ip.trim());
 
 // 🎓 IP do terminal dos alunos (com acesso restrito)
 const ipTerminalAluno = process.env.RESTRICTED_IPS.split(','); // por enquanto está o pc a esquerda
 
-// 🔄 Arquivos estáticos (CSS, JS, imagens)
+// Arquivos estáticos (CSS, JS, imagens)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 🔐 Middleware para controle de acesso por IP
+// Middleware para controle de acesso por IP
 app.use((req, res, next) => {
   const ipBruto = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket.remoteAddress;
   const ipCliente = ipBruto.replace('::ffff:', '');
@@ -43,14 +43,14 @@ app.use((req, res, next) => {
   return res.status(403).send('<h3 style="font-family: sans-serif;">Acesso negado: Este dispositivo não está autorizado.</h3>');
 });
 
-// 🔐 Sessões
+// Sessões
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
 }));
 
-// 🔐 Middleware de autenticação
+// Middleware de autenticação
 function autenticar(req, res, next) {
   const rotasLivres = ['/buscar', '/login', '/resultado'];
   if (rotasLivres.includes(req.path) || req.path.startsWith('/public')) return next();
@@ -60,10 +60,10 @@ function autenticar(req, res, next) {
 }
 app.use(autenticar);
 
-// 🧠 Body parser
+// Body parser
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// 🔧 EJS
+// EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../views'));
 
@@ -151,7 +151,7 @@ app.post('/delete/:id', async (req, res) => {
   }
 });
 
-// 📆 Relatório por data
+// Relatório por data
 app.get('/relatorio_data', (req, res) => {
   res.render('relatorio_data', { entradas: [] });
 });
@@ -179,7 +179,7 @@ app.post('/relatorio_data', async (req, res) => {
   }
 });
 
-// 🧍 Rota buscar
+// Rota buscar
 app.get('/buscar', (req, res) => {
   res.render('buscar');
 });
@@ -192,7 +192,7 @@ app.post('/buscar', async (req, res) => {
 
     console.log('📥 Dados recebidos:', JSON.stringify({ nome: nomeLimpo, ra: raLimpo, justificativa }));
 
-    // 1️⃣ Buscar o aluno pelo nome e RA
+    // 1️Buscar o aluno pelo nome e RA
     const [results] = await db.promise().query(
       'SELECT * FROM alunos WHERE nome = ? AND ra = ?', 
       [nomeLimpo, raLimpo]
@@ -201,7 +201,7 @@ app.post('/buscar', async (req, res) => {
     if (results.length > 0) {
       const aluno = results[0];
 
-      // 2️⃣ Verificar se já existe registro de entrada hoje (considerando fuso horário -03:00)
+      // Verificar se já existe registro de entrada hoje (considerando fuso horário -03:00)
       const sqlVerifica = `
         SELECT id 
         FROM entradas 
@@ -220,7 +220,7 @@ app.post('/buscar', async (req, res) => {
           erro: ` O(a) estudante ${aluno.nome} já registrou a entrada hoje.`
         };
       } else {
-        // 3️⃣ Registrar nova entrada (corrigindo fuso horário manualmente para UTC-3)
+        //  Registrar nova entrada (corrigindo fuso horário manualmente para UTC-3)
 const agora = new Date();
 const horaCorrigida = new Date(agora.getTime()); 
 
@@ -245,7 +245,7 @@ req.session.resultadoBusca = {
         aluno: null,
         horaAtual: null,
         justificativa: null,
-        erro: '❌ Verifique se digitou corretamente seu Nome e RA.'
+        erro: ' Verifique se digitou corretamente seu Nome e RA.'
       };
     }
   } catch (error) {
@@ -329,12 +329,12 @@ app.get('/relatorio_atrasos', async (req, res) => {
 
 
 
-// 📘 Manual do sistema
+// Manual do sistema
 app.get('/manual', (req, res) => {
   res.render('manual');
 });
 
-// 📆 Entradas do dia
+// Entradas do dia
 app.get('/entradas', async (req, res) => {
   try {
     const hoje = new Date();
@@ -355,7 +355,7 @@ app.get('/entradas', async (req, res) => {
   }
 });
 
-// 📆 Entradas do mês
+// Entradas do mês
 app.get('/entradas-mes', async (req, res) => {
   try {
     const agora = new Date();
@@ -390,7 +390,7 @@ app.get('/entradas-mes', async (req, res) => {
   }
 });
 
-// 🔐 Login
+// Login
 app.get('/login', (req, res) => {
   res.render('login', { erro: null });
 });
@@ -417,14 +417,14 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// 🔓 Logout
+// Logout
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
     res.redirect('/login');
   });
 });
 
-// 📊 API para dados do gráfico de entradas
+// API para dados do gráfico de entradas
 app.get('/api/entradas-chart', async (req, res) => {
   try {
     // Consulta para contar as entradas por dia nos últimos 30 dias
@@ -457,7 +457,7 @@ app.get('/api/entradas-chart', async (req, res) => {
   }
 });
 
-// ��� Inicia servidor
+// Inicia servidor
 app.listen(port, '0.0.0.0', () => {
   console.log(`Tudo ok! Servidor rodando ${port}`);
 });
