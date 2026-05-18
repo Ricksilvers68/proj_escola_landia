@@ -15,33 +15,63 @@ const ipsComAcessoTotal = process.env.FULL_ACCESS_IPS.split(',').map(ip => ip.tr
 // 🎓 IP do terminal dos alunos (com acesso restrito)
 const ipTerminalAluno = process.env.RESTRICTED_IPS.split(','); // por enquanto está o pc a esquerda
 
-// Arquivos estáticos (CSS, JS, imagens)
+
+// ==========================================
+// ⚙️ MIDDLEWARES BASE (Devem vir primeiro!)
+// ==========================================
+
+// 1. Configuração de Leitura de Dados de Formulários
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+// 2. Configuração de Sessões (Crucial vir antes do controle de IP!)
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // Garante o funcionamento em HTTP local na escola
+}));
+
+// 3. Arquivos estáticos (CSS, JS, imagens)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Middleware para controle de acesso por IP
+
+// ==========================================
+// 🛡️ MIDDLEWARE DE SESSÃO E IP (O seu Cérebro)
+// ==========================================
 app.use((req, res, next) => {
   const ipBruto = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket.remoteAddress;
   const ipCliente = ipBruto.replace('::ffff:', '');
 
   console.log(`📡 IP detectado: ${ipCliente} | Rota: ${req.path}`);
 
-  // Terminal do aluno → só pode acessar /buscar e /resultado
-  if (ipTerminalAluno.includes(ipCliente)) {
+  // 1. REGRA DA SECRETARIA (Identificação Automática por Faixa de IP)
+  const redeSecretaria = "10.112.152";
+  if (ipCliente.startsWith(redeSecretaria) || ipCliente === "127.0.0.1") {
+    req.session.usuarioLogado = "secretaria"; // 😎 Agora funciona! A sessão já existe.
+    return next(); 
+  }
+
+  // 2. REGRA DO TERMINAL DO ALUNO
+  if (typeof ipTerminalAluno !== 'undefined' && ipTerminalAluno.includes(ipCliente)) {
     const rotasPermitidas = ['/buscar', '/resultado'];
     const rotaLiberada = rotasPermitidas.includes(req.path) || req.path.startsWith('/public');
+    
     if (rotaLiberada) return next();
 
     return res.status(403).send('<h3 style="font-family: sans-serif;">Acesso restrito: Essa página não está liberada neste terminal.</h3>');
   }
 
-  // IP com acesso total
-  if (ipsComAcessoTotal.includes(ipCliente)) {
+  // 3. REGRA DE OUTROS IPS COM ACESSO TOTAL
+  if (typeof ipsComAcessoTotal !== 'undefined' && ipsComAcessoTotal.includes(ipCliente)) {
     return next();
   }
 
-  // Dispositivo não autorizado
+  // 4. DISPOSITIVO NÃO AUTORIZADO
   return res.status(403).send('<h3 style="font-family: sans-serif;">Acesso negado: Este dispositivo não está autorizado.</h3>');
 });
+
+// A partir daqui seguem as suas rotas comuns (app.get, app.post, etc...)
 
 // Sessões
 app.use(session({
