@@ -12,12 +12,12 @@ const port = 3000;
 // Lista de IPs com acesso completo
 const ipsComAcessoTotal = process.env.FULL_ACCESS_IPS.split(',').map(ip => ip.trim());
 
-// 🎓 IP do terminal dos alunos (com acesso restrito)
+//IP do terminal dos alunos (com acesso restrito)
 const ipTerminalAluno = process.env.RESTRICTED_IPS.split(','); // por enquanto está o pc a esquerda
 
 
 // ==========================================
-// ⚙️ MIDDLEWARES BASE (Devem vir primeiro!)
+// MIDDLEWARES BASE (Devem vir primeiro!)
 // ==========================================
 
 // 1. Configuração de Leitura de Dados de Formulários
@@ -37,7 +37,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 // ==========================================
-// 🛡️ MIDDLEWARE DE SESSÃO E IP (O seu Cérebro)
+// MIDDLEWARE DE SESSÃO E IP (O seu Cérebro)
 // ==========================================
 app.use((req, res, next) => {
   const ipBruto = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket.remoteAddress;
@@ -48,7 +48,7 @@ app.use((req, res, next) => {
   // 1. REGRA DA SECRETARIA (Identificação Automática por Faixa de IP)
   const redeSecretaria = "10.112.152";
   if (ipCliente.startsWith(redeSecretaria) || ipCliente === "127.0.0.1") {
-    req.session.usuarioLogado = "secretaria"; // 😎 Agora funciona! A sessão já existe.
+    req.session.usuarioLogado = "secretaria"; // Agora funciona! A sessão já existe.
     return next(); 
   }
 
