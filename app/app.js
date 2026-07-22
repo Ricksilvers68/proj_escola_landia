@@ -296,8 +296,6 @@ app.get('/resultado', (req, res) => {
 });
 
 // =====================================
-// RELATÓRIO DE ATRASOS POR ALUNO (final, com formato bonito)
-// =====================================
 // Página inicial do relatório
 app.get('/relatorio_atrasos', async (req, res) => {
   try {
@@ -428,10 +426,6 @@ app.get('/login', (req, res) => {
 app.post('/login', async (req, res) => {
   try {
     const { usuario, senha } = req.body;
-    // 🚨 ALERTA DE SEGURANÇA CRÍTICO: As senhas estão sendo comparadas em texto plano.
-    // Isso é uma vulnerabilidade grave. O correto é usar uma biblioteca como `bcrypt`
-    // para gerar um "hash" da senha no momento do cadastro e comparar o hash no login.
-    // Exemplo de comparação: const match = await bcrypt.compare(senha, usuarioDoBanco.senha_hash);
     const [rows] = await db.promise().query(
       'SELECT * FROM usuarios WHERE usuario = ? AND senha = ?', [usuario, senha]
     );
